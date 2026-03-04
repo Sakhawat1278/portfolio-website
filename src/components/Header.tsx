@@ -7,9 +7,10 @@ interface HeaderProps {
     theme: 'light' | 'dark';
     onToggleTheme: () => void;
     isScrolled: boolean;
+    isInverted?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleTheme, isScrolled }) => {
+const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleTheme, isScrolled, isInverted }) => {
     // Since the frame is var(--text-color), in light mode it's white, and in dark mode it's dark.
     // So the logo inside the frame needs to contrast with the frame.
     // This means we should ALWAYS use the inverse of the text color.
@@ -128,7 +129,9 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleThem
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    pointerEvents: 'auto'
+                    pointerEvents: 'auto',
+                    color: isInverted ? 'var(--bg-color)' : 'var(--text-color)',
+                    transition: 'color 0.4s ease'
                 }}>
                     {!isOpen && (
                         <motion.div className="header-theme-toggle" layoutId="theme-toggle" style={{ borderRadius: '50%' }}>
@@ -142,9 +145,10 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleThem
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     borderRadius: '50%',
-                                    color: 'var(--text-color)',
+                                    color: isInverted ? 'var(--bg-color)' : 'var(--text-color)',
                                     width: '40px',
                                     height: '40px',
+                                    transition: 'color 0.4s ease'
                                 }}
                             >
                                 <AnimatePresence mode="wait">
@@ -203,8 +207,8 @@ const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleThem
                                 }}
                             >
                                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                                    <div style={{ width: '26px', height: '2px', borderRadius: '2px', backgroundColor: 'var(--text-color)' }}></div>
-                                    <div style={{ width: '16px', height: '2px', borderRadius: '2px', backgroundColor: 'var(--text-color)' }}></div>
+                                    <div style={{ width: '26px', height: '2px', borderRadius: '2px', backgroundColor: isInverted ? 'var(--bg-color)' : 'var(--text-color)', transition: 'background-color 0.4s ease' }}></div>
+                                    <div style={{ width: '16px', height: '2px', borderRadius: '2px', backgroundColor: isInverted ? 'var(--bg-color)' : 'var(--text-color)', transition: 'background-color 0.4s ease' }}></div>
                                 </div>
                             </button>
                         </motion.div>

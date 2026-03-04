@@ -2,16 +2,29 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/Header';
 import Menu from './components/Menu';
 import Hero from './sections/Hero';
+import About from './sections/About';
+import Footer from './sections/Footer';
+import Preloader from './components/Preloader';
 import Lenis from 'lenis';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('portfolio-theme');
+    return (saved as 'light' | 'dark') || 'light';
+  });
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLDivElement>(null);
+
+  // Detect if footer is visible to invert header
+  const isFooterInView = useInView(footerRef, {
+    margin: "-10% 0px -90% 0px" // Trigger when footer enters the top 10% of viewport
+  });
 
   useEffect(() => {
     if (!scrollWrapperRef.current || !contentRef.current) return;
@@ -44,32 +57,32 @@ const App: React.FC = () => {
 
   React.useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('portfolio-theme', theme);
   }, [theme]);
 
-  const curtainColor = theme === 'dark' ? '#323232' : '#FAF7F0';
+  // Cinematic Entrance is now handled by the Preloader component
 
   return (
     <div ref={scrollWrapperRef} className="smooth-scroll-wrapper" style={{ position: 'fixed', inset: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', width: '100%', backgroundColor: 'var(--bg-color)' }}>
-      {/* Cinematic Entrance Curtain */}
-      <motion.div
-        initial={{ y: 0, opacity: 1 }}
-        animate={{ y: '-100%', opacity: 0 }}
-        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-        style={{
-          position: 'fixed',
-          inset: 0,
-          backgroundColor: curtainColor,
-          zIndex: 999,
-          pointerEvents: 'none'
-        }}
-      />
+      <AnimatePresence>
+        {isLoading && (
+          <Preloader theme={theme} onComplete={() => setIsLoading(false)} />
+        )}
+      </AnimatePresence>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
       >
-        <Header onOpenMenu={toggleMenu} isOpen={isMenuOpen} theme={theme} onToggleTheme={toggleTheme} isScrolled={isScrolled} />
+        <Header
+          onOpenMenu={toggleMenu}
+          isOpen={isMenuOpen}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          isScrolled={isScrolled}
+          isInverted={isFooterInView}
+        />
         <Menu isOpen={isMenuOpen} onClose={toggleMenu} theme={theme} onToggleTheme={toggleTheme} />
 
         <Hero theme={theme} />
@@ -109,28 +122,11 @@ const App: React.FC = () => {
 
             {/* Other sections will go here and slide over the hero */}
 
-            {/* Dummy section to test scroll effect */}
-            <section
-              style={{
-                height: '200vh',
-                backgroundColor: 'var(--bg-color)',
-                color: 'var(--text-color)',
-                padding: '120px 0',
-                textAlign: 'center',
-                position: 'relative',
-                zIndex: 3
-              }}
-            >
-              <div className="container">
-                <h2 style={{ fontSize: '3rem', fontWeight: 600, marginBottom: '2rem' }}>
-                  Scroll down to see the logo transition...
-                </h2>
-                <p style={{ fontSize: '1.2rem', fontWeight: 300, opacity: 0.8, maxWidth: '600px', margin: '0 auto' }}>
-                  The logo in the header will elegantly transform into an icon as you explore deeper.
-                  This is part of the premium, advanced technique usage you requested.
-                </p>
-              </div>
-            </section>
+            <About containerRef={scrollWrapperRef} />
+
+            <div ref={footerRef}>
+              <Footer />
+            </div>
           </main>
         </div>
       </motion.div>

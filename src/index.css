@@ -2,7 +2,9 @@
 
 :root {
   --bg-color: #323232;
+  --bg-color-rgb: 50, 50, 50;
   --text-color: #FAF7F0;
+  --text-color-rgb: 250, 247, 240;
   --accent-color: #FAF7F0;
   --header-bg: rgba(50, 50, 50, 0.8);
   --header-text: #FAF7F0;
@@ -14,7 +16,9 @@
 
 [data-theme='dark'] {
   --bg-color: #FAF7F0;
+  --bg-color-rgb: 250, 247, 240;
   --text-color: #323232;
+  --text-color-rgb: 50, 50, 50;
   --accent-color: #323232;
   --header-bg: rgba(250, 247, 240, 0.8);
   --header-text: #323232;
@@ -26,12 +30,6 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    fill 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    stroke 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 html {
@@ -56,11 +54,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    fill 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    stroke 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 a {
