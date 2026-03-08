@@ -5,9 +5,12 @@ interface HoverButtonProps {
     href: string;
     children: React.ReactNode;
     variant?: 'solid' | 'outline';
+    download?: string | boolean;
+    style?: React.CSSProperties;
+    className?: string;
 }
 
-const HoverButton: React.FC<HoverButtonProps> = ({ href, children, variant = 'solid' }) => {
+const HoverButton: React.FC<HoverButtonProps> = ({ href, children, variant = 'solid', download, style, className }) => {
     const buttonRef = useRef<HTMLAnchorElement>(null);
     const [hoverPos, setHoverPos] = useState({ x: 0, y: 0 });
     const [isHovered, setIsHovered] = useState(false);
@@ -45,6 +48,8 @@ const HoverButton: React.FC<HoverButtonProps> = ({ href, children, variant = 'so
         <motion.a
             ref={buttonRef}
             href={href}
+            download={download}
+            className={className}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             style={{
@@ -52,7 +57,7 @@ const HoverButton: React.FC<HoverButtonProps> = ({ href, children, variant = 'so
                 display: 'inline-flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                padding: 'clamp(0.8rem, 2vh, 1rem) clamp(1.5rem, 5vw, 2.5rem)',
+                padding: 'clamp(0.8rem, 2vw, 1rem) clamp(1.5rem, 5vw, 2.5rem)',
                 borderRadius: '50px',
                 fontWeight: 600,
                 fontSize: '0.9rem',
@@ -64,7 +69,7 @@ const HoverButton: React.FC<HoverButtonProps> = ({ href, children, variant = 'so
                 overflow: 'hidden',
                 cursor: 'pointer',
                 textDecoration: 'none',
-                // We add a tiny offset so the hover scale fits nicely
+                ...style // Allow custom styles like height
             }}
         >
             {/* The base text layer */}

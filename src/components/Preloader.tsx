@@ -6,140 +6,253 @@ interface PreloaderProps {
     theme: 'light' | 'dark';
 }
 
-const Preloader: React.FC<PreloaderProps> = ({ onComplete, theme }) => {
+const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     const [progress, setProgress] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
 
+    // Left panel is always dark, right panel always light — contrast is fixed regardless of theme
+    const leftBg = '#ff4212';
+    const rightBg = '#F0EDE8';
+    const accentColor = '#ff4212';
+
     useEffect(() => {
-        // Sophisticated non-linear progress
-        const duration = 2400; // Total duration in ms
+        const duration = 2400;
         const startTime = Date.now();
 
         const updateProgress = () => {
-            const now = Date.now();
-            const elapsed = now - startTime;
-            const percentage = Math.min(elapsed / duration, 1);
+            const elapsed = Date.now() - startTime;
+            const t = Math.min(elapsed / duration, 1);
+            const eased = Math.floor((1 - Math.pow(1 - t, 2.2)) * 100);
+            setProgress(eased);
 
-            // Easing function for progress feel
-            const easedProgress = Math.floor(percentage * 100);
-
-            setProgress(easedProgress);
-
-            if (percentage < 1) {
+            if (t < 1) {
                 requestAnimationFrame(updateProgress);
             } else {
                 setTimeout(() => {
                     setIsComplete(true);
-                    setTimeout(onComplete, 1200); // Wait for exit animation
-                }, 400);
+                    setTimeout(onComplete, 1000);
+                }, 300);
             }
         };
 
         requestAnimationFrame(updateProgress);
     }, [onComplete]);
 
-    const bgColor = theme === 'dark' ? '#0A0A0A' : '#FAF7F0';
-    const textColor = theme === 'dark' ? '#FAF7F0' : '#0A0A0A';
-    const accentColor = '#ff4212';
+    const paddedProgress = String(progress).padStart(2, '0');
+
+    const panelExit = { duration: 1.0, ease: [0.76, 0, 0.24, 1] as any };
 
     return (
         <AnimatePresence>
             {!isComplete && (
                 <motion.div
-                    initial={{ opacity: 1 }}
-                    exit={{
-                        y: '-100%',
-                        transition: { duration: 1.2, ease: [0.76, 0, 0.24, 1] }
-                    }}
                     style={{
                         position: 'fixed',
                         inset: 0,
-                        backgroundColor: bgColor,
                         zIndex: 2000,
                         display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        color: textColor,
-                        overflow: 'hidden'
+                        pointerEvents: 'auto',
+                        overflow: 'hidden',
                     }}
                 >
-                    {/* Background Grid Decoration */}
-                    <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        backgroundImage: `linear-gradient(${textColor}08 1px, transparent 1px), linear-gradient(90deg, ${textColor}08 1px, transparent 1px)`,
-                        backgroundSize: '80px 80px',
-                        opacity: 0.5
-                    }} />
-
-                    {/* Sophisticated Architectural Counter */}
-                    <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+                    {/* ── LEFT PANEL (dark) ── */}
+                    <motion.div
+                        exit={{ x: '-100%' }}
+                        transition={panelExit}
+                        style={{
+                            width: '50%',
+                            height: '100%',
+                            backgroundColor: leftBg,
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            padding: '36px 40px',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {/* Top-left label */}
                         <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 0.4, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.1 }}
                             style={{
-                                fontSize: 'clamp(6rem, 15vw, 12rem)',
-                                fontWeight: 800,
-                                fontVariantNumeric: 'tabular-nums',
-                                lineHeight: 1,
-                                letterSpacing: '-0.05em',
-                                display: 'flex',
-                                alignItems: 'baseline'
+                                fontSize: '9px',
+                                fontWeight: 700,
+                                letterSpacing: '0.3em',
+                                textTransform: 'uppercase',
+                                color: '#FFFFFF',
+                                fontFamily: 'var(--font-primary)',
                             }}
                         >
-                            <span>{progress.toString().padStart(3, '0')}</span>
-                            <span style={{ fontSize: '0.2em', marginLeft: '0.5rem', opacity: 0.3 }}>%</span>
+                            Sakhawat Hossain
                         </motion.div>
 
+                        {/* Large number — left half (dark side) */}
                         <div style={{
-                            marginTop: '2rem',
-                            width: '240px',
-                            height: '1px',
-                            backgroundColor: `${textColor}20`,
-                            position: 'relative',
-                            margin: '2rem auto'
+                            position: 'absolute',
+                            right: 0,
+                            top: '50%',
+                            transform: 'translate(50%, -50%)',
+                            zIndex: 10,
+                            lineHeight: 1,
+                            overflow: 'hidden',
+                            pointerEvents: 'none',
                         }}>
                             <motion.div
+                                initial={{ y: '100%' }}
+                                animate={{ y: 0 }}
+                                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
                                 style={{
-                                    position: 'absolute',
-                                    left: 0,
-                                    top: 0,
-                                    height: '100%',
-                                    backgroundColor: accentColor,
-                                    width: `${progress}%`
+                                    fontSize: 'clamp(5rem, 18vw, 22rem)',
+                                    fontWeight: 300,
+                                    letterSpacing: '-0.06em',
+                                    fontFamily: 'var(--font-primary)',
+                                    color: '#FFFFFF',
+                                    fontVariantNumeric: 'tabular-nums',
+                                    whiteSpace: 'nowrap',
+                                    // Clip left half: only show left portion of text
+                                    clipPath: 'inset(0 50% 0 0)',
                                 }}
-                            />
+                            >
+                                {paddedProgress}
+                            </motion.div>
                         </div>
 
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 0.4 }}
-                            style={{
-                                fontSize: '11px',
-                                letterSpacing: '0.4em',
-                                textTransform: 'uppercase',
-                                fontWeight: 600
-                            }}
-                        >
-                            Initialising Systems
-                        </motion.div>
-                    </div>
 
-                    {/* Scanning Line Effect */}
+                        {/* Progress bar — left bottom */}
+                        <motion.div
+                            style={{
+                                position: 'absolute',
+                                bottom: 0,
+                                left: 0,
+                                height: '2px',
+                                width: `${progress}%`,
+                                backgroundColor: accentColor,
+                            }}
+                        />
+                    </motion.div>
+
+                    {/* ── CENTER DIVIDER (the split line) ── */}
                     <motion.div
-                        animate={{ top: ['0%', '100%', '0%'] }}
-                        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.3 }}
                         style={{
                             position: 'absolute',
-                            left: 0,
-                            right: 0,
-                            height: '1px',
-                            background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)`,
-                            opacity: 0.2,
-                            zIndex: 2
+                            left: '50%',
+                            top: 0,
+                            width: '1px',
+                            height: '100%',
+                            backgroundColor: accentColor,
+                            zIndex: 20,
+                            transform: 'translateX(-50%)',
                         }}
                     />
+
+                    {/* ── RIGHT PANEL (light) ── */}
+                    <motion.div
+                        exit={{ x: '100%' }}
+                        transition={panelExit}
+                        style={{
+                            width: '50%',
+                            height: '100%',
+                            backgroundColor: rightBg,
+                            position: 'relative',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            padding: '36px 40px',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {/* Top-right: orange dot */}
+                        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: 'spring', stiffness: 300, delay: 0.5 }}
+                                style={{
+                                    width: '8px',
+                                    height: '8px',
+                                    borderRadius: '50%',
+                                    backgroundColor: accentColor,
+                                    position: 'relative',
+                                }}
+                            >
+                                <motion.div
+                                    animate={{ scale: [1, 2.5, 1], opacity: [0.5, 0, 0.5] }}
+                                    transition={{ duration: 2, repeat: Infinity }}
+                                    style={{
+                                        position: 'absolute',
+                                        inset: -3,
+                                        borderRadius: '50%',
+                                        border: `1px solid ${accentColor}`,
+                                    }}
+                                />
+                            </motion.div>
+                        </div>
+
+                        {/* Large number — right half (light side) */}
+                        <div style={{
+                            position: 'absolute',
+                            left: 0,
+                            top: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            zIndex: 10,
+                            lineHeight: 1,
+                            overflow: 'hidden',
+                            pointerEvents: 'none',
+                        }}>
+                            <motion.div
+                                initial={{ y: '100%' }}
+                                animate={{ y: 0 }}
+                                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1], delay: 0.15 }}
+                                style={{
+                                    fontSize: 'clamp(5rem, 18vw, 22rem)',
+                                    fontWeight: 300,
+                                    letterSpacing: '-0.06em',
+                                    fontFamily: 'var(--font-primary)',
+                                    color: '#0A0A0A',
+                                    fontVariantNumeric: 'tabular-nums',
+                                    whiteSpace: 'nowrap',
+                                    // Clip right half
+                                    clipPath: 'inset(0 0 0 50%)',
+                                }}
+                            >
+                                {paddedProgress}
+                            </motion.div>
+                        </div>
+
+                        {/* Bottom-right: percentage label */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 0.35, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                            style={{
+                                fontSize: '9px',
+                                fontWeight: 700,
+                                letterSpacing: '0.3em',
+                                textTransform: 'uppercase',
+                                color: '#0A0A0A',
+                                fontFamily: 'var(--font-primary)',
+                                textAlign: 'right',
+                            }}
+                        >
+                            {progress < 100 ? 'Loading' : 'Ready'}
+                        </motion.div>
+
+                        {/* Progress bar — right bottom (mirrored) */}
+                        <motion.div
+                            style={{
+                                position: 'absolute',
+                                bottom: 0,
+                                right: 0,
+                                height: '2px',
+                                width: `${progress}%`,
+                                backgroundColor: accentColor,
+                            }}
+                        />
+                    </motion.div>
                 </motion.div>
             )}
         </AnimatePresence>

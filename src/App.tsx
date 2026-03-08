@@ -1,12 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Header from './components/Header';
 import Menu from './components/Menu';
 import Hero from './sections/Hero';
-import About from './sections/About';
-import Footer from './sections/Footer';
 import Preloader from './components/Preloader';
 import Lenis from 'lenis';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { SpeedInsights } from "@vercel/speed-insights/react";
+
+// ── Lazy-load below-fold sections ──────────────────────────────────────────
+// These are not needed on initial render and will be code-split automatically
+const About = lazy(() => import('./sections/About'));
+const Services = lazy(() => import('./sections/Services'));
+const TechStack = lazy(() => import('./sections/TechStack'));
+const SelectedWorks = lazy(() => import('./sections/SelectedWorks'));
+const Testimonials = lazy(() => import('./sections/Testimonials'));
+const ExperienceEducation = lazy(() => import('./sections/ExperienceEducation'));
+const Contact = lazy(() => import('./sections/Contact'));
+const Footer = lazy(() => import('./sections/Footer'));
+
+// Minimal inline fallback — no layout shift, no external deps
+const SectionFallback = () => (
+  <div style={{ minHeight: '30vh', width: '100%' }} aria-hidden="true" />
+);
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -14,56 +29,56 @@ const App: React.FC = () => {
     const saved = localStorage.getItem('portfolio-theme');
     return (saved as 'light' | 'dark') || 'light';
   });
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const scrollWrapperRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
 
-  // Detect if footer is visible to invert header
   const isFooterInView = useInView(footerRef, {
-    margin: "-10% 0px -90% 0px" // Trigger when footer enters the top 10% of viewport
+    margin: "0px 0px -95% 0px",
+    amount: 0
   });
 
+  const lenisRef = useRef<Lenis | null>(null);
+
   useEffect(() => {
-    if (!scrollWrapperRef.current || !contentRef.current) return;
+    const lenis = new Lenis({ lerp: 0.18, wheelMultiplier: 0.9 });
+    lenisRef.current = lenis;
 
-    const lenis = new Lenis({
-      wrapper: scrollWrapperRef.current,
-      content: contentRef.current,
-      lerp: 0.08, // Premium cinematic easing weight 
-      wheelMultiplier: 0.9,
-    });
-
-    lenis.on('scroll', (e) => {
-      setIsScrolled(e.scroll > 50);
-    });
-
+    let rafId: number;
     function raf(time: number) {
       lenis.raf(time);
-      requestAnimationFrame(raf);
+      rafId = requestAnimationFrame(raf);
     }
-    const rafId = requestAnimationFrame(raf);
+    rafId = requestAnimationFrame(raf);
 
     return () => {
       lenis.destroy();
       cancelAnimationFrame(rafId);
+      lenisRef.current = null;
     };
   }, []);
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  // Lock scroll when menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+      lenisRef.current?.stop();
+    } else {
+      document.body.style.overflow = 'unset';
+      lenisRef.current?.start();
+    }
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => setIsMenuOpen(prev => !prev);
   const toggleTheme = () => setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
 
-  React.useEffect(() => {
+  useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('portfolio-theme', theme);
   }, [theme]);
 
-  // Cinematic Entrance is now handled by the Preloader component
-
   return (
-    <div ref={scrollWrapperRef} className="smooth-scroll-wrapper" style={{ position: 'fixed', inset: 0, overflowY: 'auto', overflowX: 'hidden', WebkitOverflowScrolling: 'touch', width: '100%', backgroundColor: 'var(--bg-color)' }}>
+    <div className="smooth-scroll-wrapper" style={{ width: '100%', backgroundColor: 'var(--bg-color)' }}>
       <AnimatePresence>
         {isLoading && (
           <Preloader theme={theme} onComplete={() => setIsLoading(false)} />
@@ -80,56 +95,49 @@ const App: React.FC = () => {
           isOpen={isMenuOpen}
           theme={theme}
           onToggleTheme={toggleTheme}
-          isScrolled={isScrolled}
           isInverted={isFooterInView}
         />
-        <Menu isOpen={isMenuOpen} onClose={toggleMenu} theme={theme} onToggleTheme={toggleTheme} />
+        <Menu isOpen={isMenuOpen} onClose={toggleMenu} theme={theme} />
 
-        <Hero theme={theme} />
+        <Hero isReady={!isLoading} />
 
-        <div ref={contentRef} className="smooth-scroll-content" style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
-          {/* Spacer for fixed Hero */}
-          <div style={{ height: '100vh', pointerEvents: 'none' }} />
+        <div
+          className="smooth-scroll-content"
+          style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent', pointerEvents: 'none' }}
+        >
+          <main style={{ backgroundColor: 'var(--bg-color)', position: 'relative', zIndex: 2, pointerEvents: 'auto' }}>
 
-          <main style={{ backgroundColor: 'var(--bg-color)', position: 'relative', zIndex: 2 }}>
-            {/* Top Shadow Blend (Slides over Hero) */}
-            <div style={{
-              position: 'absolute',
-              top: '-100px', // Starts slightly above to ensure zero gap
-              left: 0,
-              right: 0,
-              height: '150px',
-              pointerEvents: 'none',
-              zIndex: 4
-            }}>
-              {/* Light Theme Blend */}
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to bottom, transparent, #FAF7F0 60%)',
-                opacity: theme === 'dark' ? 1 : 0,
-                transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-              }} />
-              {/* Dark Theme Blend */}
-              <div style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to bottom, transparent, #323232 60%)',
-                opacity: theme === 'light' ? 1 : 0,
-                transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-              }} />
-            </div>
-
-            {/* Other sections will go here and slide over the hero */}
-
-            <About containerRef={scrollWrapperRef} />
+            <Suspense fallback={<SectionFallback />}>
+              <About theme={theme} />
+            </Suspense>
+            <Suspense fallback={<SectionFallback />}>
+              <Services theme={theme} />
+            </Suspense>
+            <Suspense fallback={<SectionFallback />}>
+              <TechStack />
+            </Suspense>
+            <Suspense fallback={<SectionFallback />}>
+              <SelectedWorks />
+            </Suspense>
+            <Suspense fallback={<SectionFallback />}>
+              <Testimonials />
+            </Suspense>
+            <Suspense fallback={<SectionFallback />}>
+              <ExperienceEducation />
+            </Suspense>
+            <Suspense fallback={<SectionFallback />}>
+              <Contact theme={theme} />
+            </Suspense>
 
             <div ref={footerRef}>
-              <Footer />
+              <Suspense fallback={<SectionFallback />}>
+                <Footer theme={theme} />
+              </Suspense>
             </div>
           </main>
         </div>
       </motion.div>
+      <SpeedInsights />
     </div>
   );
 };

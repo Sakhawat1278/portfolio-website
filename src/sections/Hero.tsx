@@ -3,203 +3,157 @@ import { motion } from 'framer-motion';
 import HoverButton from '../components/HoverButton';
 
 interface HeroProps {
-    theme: 'light' | 'dark';
+    isReady: boolean;
 }
 
-const Hero: React.FC<HeroProps> = ({ theme }) => {
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.2,
-                delayChildren: 0.4
-            }
-        }
-    };
-
-    const itemVariants = {
-        hidden: { y: 60, opacity: 0 },
-        visible: {
-            y: 0,
-            opacity: 1,
-            transition: {
-                duration: 0.8,
-                ease: [0.77, 0, 0.175, 1] as any
-            }
-        }
-    };
+const Hero: React.FC<HeroProps> = ({ isReady }) => {
+    const title = "CREATIVE ALWAYS";
 
     return (
         <section
             id="home"
             className="hero-section"
             style={{
-                position: 'fixed',
-                inset: 0,
-                height: '100vh',
-                zIndex: 0,
+                position: 'relative',
+                width: '100%',
                 backgroundColor: 'var(--bg-color)',
-                overflow: 'hidden',
-                padding: 'clamp(120px, 15vh, 180px) clamp(40px, 8vw, 6rem) clamp(100px, 15vh, 140px)'
+                paddingTop: 'var(--header-height)',
+                display: 'flex',
+                flexDirection: 'column'
             }}
         >
-            {/* Absolute 3D Abstract Background Container */}
-            <div style={{
-                position: 'absolute',
-                inset: 0,
-                zIndex: 0,
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none'
-            }}>
-                <motion.video
-                    initial={{ scale: 1.1, opacity: 0 }}
-                    animate={{ scale: 1.02, opacity: 1 }}
-                    transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-                    src="/White Background Video.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
+            {/* ── Row 1: Headline + Video ── */}
+            <div className="hero-row-1">
+                {/* Animated bottom border */}
+                <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={isReady ? { scaleX: 1 } : { scaleX: 0 }}
+                    transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] as any, delay: 0.1 }}
                     style={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
                         width: '100%',
-                        height: '100%',
-                        objectFit: 'cover',
-                        objectPosition: 'center center'
+                        height: '1px',
+                        backgroundColor: 'var(--border-color)',
+                        transformOrigin: 'left center'
                     }}
                 />
 
-                {/* Light Appearance Vignette & Bottom Blend (triggered by 'dark' theme state) */}
-                <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    boxShadow: 'inset 0 0 120px 20px #FAF7F0',
-                    background: 'linear-gradient(to top, #FAF7F0 0%, #FAF7F0 2%, transparent 30%)',
-                    pointerEvents: 'none',
-                    opacity: theme === 'dark' ? 1 : 0,
-                    transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-                }} />
+                {/* LEFT: Headline + dot + buttons */}
+                <motion.div
+                    className="hero-left"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={isReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+                    transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] as any, delay: 0.2 }}
+                >
+                    {/* Headline + dot */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                        <h2 className="hero-headline">
+                            DESIGN STUDIO<br />
+                            FOR <span style={{ color: 'var(--accent-color)' }}>TIMELESS</span><br />
+                            BRANDING.
+                        </h2>
 
-                {/* Dark Appearance Vignette & Bottom Blend (triggered by 'light' theme state) */}
-                <div style={{
-                    position: 'absolute',
-                    inset: 0,
-                    boxShadow: 'inset 0 0 120px 20px #323232',
-                    background: 'linear-gradient(to top, #323232 0%, #323232 2%, transparent 30%)',
-                    pointerEvents: 'none',
-                    opacity: theme === 'light' ? 1 : 0,
-                    transition: 'opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
-                }} />
+                        {/* Orange live dot */}
+                        <div style={{ position: 'relative', marginTop: '0.25em', flexShrink: 0 }}>
+                            <div style={{
+                                width: '10px',
+                                height: '10px',
+                                borderRadius: '50%',
+                                backgroundColor: '#ff4212'
+                            }} />
+                            <motion.div
+                                animate={{ scale: [1, 1.8, 1], opacity: [0.5, 0, 0.5] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                                style={{
+                                    position: 'absolute',
+                                    inset: -4,
+                                    borderRadius: '50%',
+                                    border: '1px solid #ff4212'
+                                }}
+                            />
+                        </div>
+                    </div>
+
+                    {/* Mobile-only: square video between headline and buttons */}
+                    <motion.div
+                        className="hero-video-mobile"
+                        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                        animate={isReady ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : {}}
+                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as any, delay: 0.4 }}
+                    >
+                        <video
+                            src="/Wireframe.mp4"
+                            autoPlay muted loop playsInline
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                    </motion.div>
+
+                    {/* Buttons */}
+                    <div className="hero-buttons">
+                        <HoverButton href="#works" variant="solid">EXPLORE_WORKS</HoverButton>
+                        <HoverButton href="#contact" variant="outline">START_MISSION</HoverButton>
+                    </div>
+                </motion.div>
+
+                {/* RIGHT: Square video — tablet + desktop */}
+                <motion.div
+                    className="hero-video-desktop"
+                    initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                    animate={isReady ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : { opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as any, delay: 0.4 }}
+                >
+                    <video
+                        src="/Wireframe.mp4"
+                        autoPlay muted loop playsInline
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                </motion.div>
             </div>
 
-            <motion.div
-                className="container hero-content-container"
-                initial="hidden"
-                animate="visible"
-                variants={containerVariants}
-                style={{ zIndex: 1, maxWidth: '100%' }}
-            >
-                <motion.span
-                    variants={itemVariants}
-                    style={{
-                        fontSize: '11px',
-                        letterSpacing: '0.2em',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        marginBottom: '1rem',
-                        display: 'block',
-                        color: 'var(--text-color)',
-                        opacity: 0.5
-                    }}
-                >
-                    Code | Create | Innovate
-                </motion.span>
-                <motion.h1
-                    variants={itemVariants}
-                    style={{
-                        fontSize: 'clamp(1.8rem, 9vw, 5.5rem)',
-                        fontWeight: 800,
-                        lineHeight: 1.05,
-                        letterSpacing: '-0.02em',
-                        marginBottom: '1.5rem',
-                        color: 'var(--text-color)',
-                        textTransform: 'uppercase',
-                        whiteSpace: 'nowrap'
-                    }}
-                >
-                    Beyond Code<br />
-                    <motion.span
-                        style={{
-                            color: '#ff4212',
-                            backgroundColor: 'var(--text-color)',
-                            padding: '0 0.5rem',
-                            display: 'inline-block',
-                            marginTop: '0.2rem',
-                            marginBottom: '0.2rem'
-                        }}
-                    >
-                        Engineering
-                    </motion.span><br />
-                    Impact
-                </motion.h1>
-
-                <motion.p
-                    variants={itemVariants}
-                    style={{
-                        fontSize: 'clamp(0.9rem, 1.5vw, 1.1rem)',
-                        fontWeight: 300,
-                        maxWidth: '450px',
-                        marginBottom: '2rem',
-                        color: 'var(--text-color)',
-                        opacity: 0.7,
-                        lineHeight: 1.6
-                    }}
-                >
-                    Architecting scalable digital solutions that bridge the gap between complex
-                    engineering and seamless business growth. Specialized in high-performance
-                    digital systems.
-                </motion.p>
-
+            {/* ── Row 2: CREATIVE ALWAYS ── */}
+            <div className="hero-row-2">
+                {/* Animated bottom border */}
                 <motion.div
-                    className="hero-buttons"
-                    variants={itemVariants}
+                    initial={{ scaleX: 0 }}
+                    animate={isReady ? { scaleX: 1 } : { scaleX: 0 }}
+                    transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] as any, delay: 0.6 }}
                     style={{
-                        gap: '1rem',
-                        flexWrap: 'wrap'
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '1px',
+                        backgroundColor: 'var(--border-color)',
+                        transformOrigin: 'left center'
                     }}
-                >
-                    <HoverButton href="#work" variant="solid">
-                        View My Work
-                    </HoverButton>
-                    <HoverButton href="#contact" variant="outline">
-                        Get in Touch
-                    </HoverButton>
-                </motion.div>
-            </motion.div>
+                />
 
-            {/* Subtle floating background decoration */}
-            <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 0.05, scale: 1 }}
-                transition={{ duration: 2, ease: "easeOut" }}
-                style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '60vw',
-                    height: '60vw',
-                    backgroundColor: 'var(--text-color)',
-                    borderRadius: '50%',
-                    filter: 'blur(100px)',
-                    zIndex: 0,
-                    pointerEvents: 'none'
-                }}
-            />
-        </section >
+                <div className="hero-marquee-inner">
+                    {title.split(" ").map((word, wordIdx) => (
+                        <div key={wordIdx} style={{ display: 'flex' }}>
+                            {word.split("").map((char, charIdx) => (
+                                <div key={charIdx} style={{ overflow: 'hidden', display: 'flex' }}>
+                                    <motion.span
+                                        className="hero-marquee-char"
+                                        initial={{ y: '100%' }}
+                                        animate={isReady ? { y: 0 } : { y: '100%' }}
+                                        transition={{
+                                            duration: 1.2,
+                                            ease: [0.16, 1, 0.3, 1],
+                                            delay: 0.8 + (wordIdx * 0.1) + (charIdx * 0.03)
+                                        }}
+                                    >
+                                        {char}
+                                    </motion.span>
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
     );
 };
 

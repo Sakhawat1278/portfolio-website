@@ -1,221 +1,139 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import ThemeToggle from './ThemeToggle';
+import HoverButton from './HoverButton';
 
 interface HeaderProps {
     onOpenMenu: () => void;
     isOpen: boolean;
     theme: 'light' | 'dark';
     onToggleTheme: () => void;
-    isScrolled: boolean;
     isInverted?: boolean;
 }
 
-const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleTheme, isScrolled, isInverted }) => {
-    // Since the frame is var(--text-color), in light mode it's white, and in dark mode it's dark.
-    // So the logo inside the frame needs to contrast with the frame.
-    // This means we should ALWAYS use the inverse of the text color.
-    const currentLogo = theme === 'light' ? '/Black_Sohan.png' : '/White_Sohan.png';
-    const [isMobile, setIsMobile] = React.useState(false);
-
-    React.useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth <= 600);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
-    const hideTopFrame = isOpen && isMobile;
+const Header: React.FC<HeaderProps> = ({ onOpenMenu, isOpen, theme, onToggleTheme, isInverted }) => {
+    const currentLogo = theme === 'light' ? '/New_logo_white.png' : '/New_logo_dark.png';
 
     return (
-        <>
-            {/* The global frame wrapper */}
-            <div
-                style={{
-                    position: 'fixed',
-                    inset: 0,
-                    zIndex: 110,
-                    pointerEvents: 'none',
-                    overflow: 'hidden'
-                }}
-            >
-                {/* The main 20px frame using native safe bounds to support iOS/WebKit rendering */}
-                <div
-                    className="global-frame-border"
-                    style={{
-                        position: 'absolute',
-                        inset: 0,
-                        boxSizing: 'border-box'
-                    }} />
+        <motion.header
+            initial={{ opacity: 0, y: -20 }}
+            animate={{
+                opacity: isInverted ? 0 : 1,
+                y: isInverted ? -20 : 0
+            }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                zIndex: 600,
+                pointerEvents: 'none',
+                color: 'var(--text-color)'
+            }}
+        >
+            <div style={{
+                width: '100%',
+                height: 'var(--header-height)',
+                padding: '0 var(--section-px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                borderBottom: '1px solid var(--border-color)',
+                backgroundColor: isOpen ? 'transparent' : 'var(--bg-color)',
+                transition: 'background-color 0.3s ease',
+                pointerEvents: 'auto'
+            }}>
+                {/* Left: Logo */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', flex: 1 }}>
+                    <img
+                        src={currentLogo}
+                        alt="Sohan Logo"
+                        className="header-logo"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    />
+                </div>
 
-                {/* Top Cutout SVG */}
-                <motion.div
-                    className="top-svg-wrapper"
-                    initial={{ x: "-50%", y: -150, opacity: 0 }}
-                    animate={{
-                        x: "-50%",
-                        y: hideTopFrame ? -150 : 0,
-                        opacity: hideTopFrame ? 0 : 1
-                    }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    style={{
-                        position: 'absolute',
-                        left: '50%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        pointerEvents: 'none'
-                    }}>
-                    <svg width="220" height="36" viewBox="0 0 220 36" style={{ display: 'block', overflow: 'visible' }} shapeRendering="crispEdges">
-                        <path d="M 0 0 C 20 0, 20 36, 40 36 L 180 36 C 200 36, 200 0, 220 0 Z" fill="var(--text-color)" />
-                    </svg>
+                {/* Right Area: Theme Toggle, Menu & Location */}
+                {/* Right Area: Controls */}
+                <div className="header-controls" style={{ pointerEvents: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '20px' }}>
+                    {/* Theme Toggle, CV Download & Menu */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        {/* CV Download Button */}
+                        <HoverButton
+                            href="/Sakhawat_Hossain_CV_(5.0).pdf"
+                            variant="outline"
+                            download="Sakhawat_Hossain_CV.pdf"
+                            className="header-cv-button"
+                            style={{ height: '40px', padding: '0 20px', borderColor: 'var(--border-color)' }}
+                        >
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '10px', letterSpacing: '0.1em' }} className="cv-button-text">
+                                    DOWNLOAD CV
+                                </span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                            </div>
+                        </HoverButton>
 
-                    <div style={{ position: 'absolute', top: '-15px', left: 0, right: 0, height: '51px', display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'auto' }}>
-                        <div style={{ height: '28px', position: 'relative', width: '140px', display: 'flex', justifyContent: 'center', cursor: 'pointer' }}>
-                            <img
-                                src={currentLogo}
-                                alt="Sohan Logo"
+                        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+
+                        <motion.div
+                            onClick={onOpenMenu}
+                            whileHover={{ opacity: 0.7 }}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '12px',
+                                cursor: 'pointer',
+                                padding: '8px 0',
+                                backgroundColor: 'transparent',
+                                color: 'var(--text-color)'
+                            }}
+                        >
+                            <div style={{ width: '45px', overflow: 'hidden' }}>
+                                <span style={{
+                                    fontSize: '16px',
+                                    fontWeight: 500,
+                                    letterSpacing: '-0.01em',
+                                    fontFamily: 'var(--font-primary)',
+                                    display: 'block'
+                                }}>
+                                    {isOpen ? 'Close' : 'Menu'}
+                                </span>
+                            </div>
+                            <motion.div
+                                animate={{ rotate: isOpen ? 45 : 0 }}
+                                transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
                                 style={{
-                                    height: '100%',
-                                    width: '100%',
-                                    objectFit: 'contain',
-                                    position: 'absolute'
-                                }}
-                            />
-                        </div>
-                    </div>
-                </motion.div>
-
-                {/* Bottom Cutout SVG */}
-                <motion.div
-                    className="bottom-svg-wrapper"
-                    initial={{ x: "-50%", y: 150, opacity: 0 }}
-                    animate={{
-                        x: "-50%",
-                        y: isScrolled ? 150 : 0,
-                        opacity: isScrolled ? 0 : 1
-                    }}
-                    transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                    style={{
-                        position: 'absolute',
-                        left: '50%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        pointerEvents: 'none'
-                    }}>
-                    <svg width="180" height="32" viewBox="0 0 180 32" style={{ display: 'block', overflow: 'visible' }} shapeRendering="crispEdges">
-                        <path d="M 0 32 C 24 32, 24 0, 48 0 L 132 0 C 156 0, 156 32, 180 32 Z" fill="var(--text-color)" />
-                    </svg>
-
-                    {/* Scroll Down text inside Bottom Cutout */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '46px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '3px', pointerEvents: 'auto' }}>
-                        <span style={{
-                            color: 'var(--bg-color)',
-                            fontSize: '9px',
-                            fontWeight: 600,
-                            letterSpacing: '0.15em',
-                            cursor: 'pointer',
-                            marginTop: '2px'
-                        }}>
-                            SCROLL DOWN
-                        </span>
-                        <div style={{ width: '12px', height: '2px', backgroundColor: 'var(--bg-color)', borderRadius: '2px' }} />
-                    </div>
-                </motion.div>
-
-                {/* Right Top Icons (Floating inside the frame) */}
-                <div style={{
-                    position: 'absolute',
-                    top: 'clamp(24px, 5vw, 40px)',
-                    right: 'clamp(24px, 5vw, 40px)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    pointerEvents: 'auto',
-                    color: isInverted ? 'var(--bg-color)' : 'var(--text-color)',
-                    transition: 'color 0.4s ease'
-                }}>
-                    {!isOpen && (
-                        <motion.div className="header-theme-toggle" layoutId="theme-toggle" style={{ borderRadius: '50%' }}>
-                            <button
-                                onClick={onToggleTheme}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    borderRadius: '50%',
-                                    color: isInverted ? 'var(--bg-color)' : 'var(--text-color)',
-                                    width: '40px',
-                                    height: '40px',
-                                    transition: 'color 0.4s ease'
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(2, 4px)',
+                                    gap: '5px',
+                                    marginTop: '1px'
                                 }}
                             >
-                                <AnimatePresence mode="wait">
-                                    {theme === 'light' ? (
-                                        <motion.svg
-                                            key="sun"
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.8 }}
-                                            transition={{ duration: 0.2 }}
-                                            width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                        >
-                                            <circle cx="12" cy="12" r="5"></circle>
-                                            <line x1="12" y1="1" x2="12" y2="3"></line>
-                                            <line x1="12" y1="21" x2="12" y2="23"></line>
-                                            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                            <line x1="1" y1="12" x2="3" y2="12"></line>
-                                            <line x1="21" y1="12" x2="23" y2="12"></line>
-                                            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                                        </motion.svg>
-                                    ) : (
-                                        <motion.svg
-                                            key="moon"
-                                            initial={{ opacity: 0, scale: 0.8 }}
-                                            animate={{ opacity: 1, scale: 1 }}
-                                            exit={{ opacity: 0, scale: 0.8 }}
-                                            transition={{ duration: 0.2 }}
-                                            width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                                        >
-                                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                                        </motion.svg>
-                                    )}
-                                </AnimatePresence>
-                            </button>
+                                {[...Array(4)].map((_, i) => (
+                                    <div
+                                        key={i}
+                                        style={{
+                                            width: '4px',
+                                            height: '4px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'currentColor'
+                                        }}
+                                    />
+                                ))}
+                            </motion.div>
                         </motion.div>
-                    )}
-
-                    {!isOpen && (
-                        <motion.div layoutId="menu-toggle" style={{ borderRadius: '50%' }}>
-                            <button
-                                onClick={onOpenMenu}
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    justifyContent: 'center',
-                                    alignItems: 'center',
-                                    gap: '6px',
-                                    width: '40px',
-                                    height: '40px',
-                                    borderRadius: '50%',
-                                }}
-                            >
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                                    <div style={{ width: '26px', height: '2px', borderRadius: '2px', backgroundColor: isInverted ? 'var(--bg-color)' : 'var(--text-color)', transition: 'background-color 0.4s ease' }}></div>
-                                    <div style={{ width: '16px', height: '2px', borderRadius: '2px', backgroundColor: isInverted ? 'var(--bg-color)' : 'var(--text-color)', transition: 'background-color 0.4s ease' }}></div>
-                                </div>
-                            </button>
-                        </motion.div>
-                    )}
+                    </div>
                 </div>
             </div>
-        </>
+        </motion.header>
     );
 };
 
