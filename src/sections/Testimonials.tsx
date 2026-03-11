@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
-import 'swiper/swiper.css';
+import 'swiper/css';
 
 const testimonials = [
     {
@@ -188,12 +188,13 @@ const Testimonials: React.FC = () => {
                             viewport={{ once: true }}
                             transition={{ delay: 0.08 }}
                             style={{
-                                fontSize: 'clamp(3rem, 7vw, 7.5rem)',
+                                fontSize: 'clamp(2.2rem, 7vw, 5rem)',
                                 fontWeight: 900,
                                 lineHeight: 0.85,
                                 letterSpacing: '-0.05em',
                                 textTransform: 'uppercase',
                                 margin: 0,
+                                opacity: 0.7,
                             }}
                         >
                             Industrial<br />
@@ -262,6 +263,7 @@ const Testimonials: React.FC = () => {
                         <div style={{ display: 'flex', gap: '8px' }}>
                             <button
                                 onClick={prevSlide}
+                                aria-label="Previous testimonial"
                                 style={{
                                     background: 'transparent',
                                     border: '1px solid var(--border-color)',
@@ -283,6 +285,7 @@ const Testimonials: React.FC = () => {
                             </button>
                             <button
                                 onClick={nextSlide}
+                                aria-label="Next testimonial"
                                 style={{
                                     background: 'transparent',
                                     border: '1px solid var(--border-color)',

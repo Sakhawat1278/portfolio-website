@@ -1,0 +1,27 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="900" fill="#0a0a0a"/>
+    <defs>
+        <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255, 77, 0, 0.05)" stroke-width="1"/>
+        </pattern>
+    </defs>
+    <rect width="1200" height="900" fill="url(#grid)" />
+    
+    <!-- Title Text -->
+    <text x="600" y="100" font-family="Arial, sans-serif" font-weight="900" font-size="40" fill="#ff4d00" text-anchor="middle" opacity="0.8" style="text-transform: uppercase; letter-spacing: 5px;">WP Plugin</text>
+    <text x="600" y="145" font-family="Arial, sans-serif" font-weight="400" font-size="18" fill="#ff4d00" text-anchor="middle" opacity="0.4" style="letter-spacing: 2px;">TECHNICAL BLUEPRINT // WOODMART FILE UPLOADER</text>
+
+    
+            <rect x="350" y="300" width="500" height="400" rx="20" fill="none" stroke="#ff4d00" stroke-width="3" opacity="0.5"/>
+            <path d="M450 300 L450 250 L550 250 L550 300" fill="none" stroke="#ff4d00" stroke-width="3" opacity="0.4"/>
+            <circle cx="600" cy="500" r="80" fill="rgba(255, 77, 0, 0.2)"/>
+            <path d="M560 500 L640 500 M600 460 L600 540" stroke="#ff4d00" stroke-width="10" stroke-linecap="round" opacity="0.6"/>
+            <path d="M400 650 L800 650" stroke="#ff4d00" stroke-width="2" stroke-dasharray="10 10" opacity="0.3"/>
+        
+
+    <!-- Corner Accents -->
+    <path d="M50 50 L100 50 M50 50 L50 100" stroke="#ff4d00" stroke-width="2" opacity="0.5"/>
+    <path d="M1150 50 L1100 50 M1150 50 L1150 100" stroke="#ff4d00" stroke-width="2" opacity="0.5"/>
+    <path d="M50 850 L100 850 M50 850 L50 800" stroke="#ff4d00" stroke-width="2" opacity="0.5"/>
+    <path d="M1150 850 L1100 850 M1150 850 L1150 800" stroke="#ff4d00" stroke-width="2" opacity="0.5"/>
+</svg>

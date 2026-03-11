@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import HoverButton from '../components/HoverButton';
 
 // ─── INTERNAL API CONFIG ──────────────────────────────────────────────────
 // Automatically use the live endpoint if on localhost to avoid 404s
-const API_ENDPOINT = window.location.hostname === 'localhost'
-    ? 'https://sohanux.com/api/contact'
-    : '/api/contact';
+const API_ENDPOINT = '/api/contact';
 
 interface ContactProps {
     theme: 'light' | 'dark';
+    hideExtras?: boolean;
+    variant?: 'classic' | 'step';
 }
 
 const AnimatedHeading = ({ text }: { text: string }) => {
@@ -31,7 +32,7 @@ const AnimatedHeading = ({ text }: { text: string }) => {
             whileInView="visible"
             viewport={{ once: true, amount: 0.5 }}
             style={{
-                fontSize: 'clamp(1.8rem, 8vw, 5.5rem)',
+                fontSize: 'clamp(2.2rem, 8vw, 5rem)',
                 fontWeight: 800,
                 lineHeight: 1.05,
                 letterSpacing: '-0.03em',
@@ -40,7 +41,7 @@ const AnimatedHeading = ({ text }: { text: string }) => {
                 flexWrap: 'wrap',
                 gap: '0.15em',
                 width: '100%',
-                wordBreak: 'break-word',
+                wordBreak: 'normal',
                 overflowWrap: 'break-word'
             }}
         >
@@ -72,72 +73,51 @@ const SubmitButton = ({ status }: { status: Status }) => {
         success: 'UPLINK_CONFIRMED ✓',
         error: 'RETRY_TRANSMISSION',
     };
-    const colors: Record<Status, string> = {
-        idle: 'var(--text-color)',
-        sending: '#888',
-        success: '#00c853',
-        error: '#ff4212',
-    };
 
     return (
-        <motion.button
+        <HoverButton
             type="submit"
             disabled={status === 'sending'}
-            whileHover={status !== 'sending' ? { scale: 1.02 } : {}}
-            whileTap={status !== 'sending' ? { scale: 0.97 } : {}}
+            variant="solid"
             style={{
-                position: 'relative',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                padding: '0 28px',
-                height: '48px',
-                borderRadius: '50px',
-                fontWeight: 700,
-                fontSize: '10px',
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                backgroundColor: colors[status],
-                color: status === 'idle' ? 'var(--bg-color)' : '#fff',
-                border: 'none',
-                cursor: status === 'sending' ? 'not-allowed' : 'pointer',
-                fontFamily: 'var(--font-primary)',
-                transition: 'background-color 0.4s ease, color 0.3s ease',
-                overflow: 'hidden',
-                whiteSpace: 'nowrap',
+                width: 'auto',
+                minWidth: '180px',
+                height: '50px',
+                padding: '0 2.5rem',
+                backgroundColor: status === 'success' ? '#00c853' : status === 'error' ? '#ff4212' : 'var(--text-color)',
             }}
         >
             <AnimatePresence mode="wait">
-                <motion.span
+                <motion.div
                     key={status}
                     initial={{ y: 12, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: -12, opacity: 0 }}
                     transition={{ duration: 0.25 }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
                 >
                     {labels[status]}
-                </motion.span>
+                    {status === 'sending' && (
+                        <motion.div
+                            style={{
+                                width: '14px',
+                                height: '14px',
+                                border: '2px solid rgba(255,255,255,0.3)',
+                                borderTopColor: '#fff',
+                                borderRadius: '50%',
+                            }}
+                            animate={{ rotate: 360 }}
+                            transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
+                        />
+                    )}
+                </motion.div>
             </AnimatePresence>
-            {status === 'sending' && (
-                <motion.div
-                    style={{
-                        width: '14px',
-                        height: '14px',
-                        border: '2px solid rgba(255,255,255,0.3)',
-                        borderTopColor: '#fff',
-                        borderRadius: '50%',
-                    }}
-                    animate={{ rotate: 360 }}
-                    transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
-                />
-            )}
-        </motion.button>
+        </HoverButton>
     );
 };
 
 // ─── MAIN COMPONENT ──────────────────────────────────────────────────────────
-const Contact: React.FC<ContactProps> = () => {
+const Contact: React.FC<ContactProps> = ({ hideExtras = false, variant = 'step' }) => {
     const [isFocused, setIsFocused] = useState<string | null>(null);
     const [time, setTime] = useState(new Date());
     const [status, setStatus] = useState<Status>('idle');
@@ -153,8 +133,31 @@ const Contact: React.FC<ContactProps> = () => {
         setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
     };
 
+    const [currentStep, setCurrentStep] = useState(0);
+    const steps = [
+        { id: 'name', label: '01_IDENTIFICATION', placeholder: 'Full Name', type: 'text' },
+        { id: 'email', label: '02_COMM_CHANNEL', placeholder: 'Email Address', type: 'email' },
+        { id: 'message', label: '03_MISSION_OBJECTIVES', placeholder: 'Define your mission...', type: 'textarea' }
+    ];
+
+    const nextStep = () => {
+        if (currentStep === 0 && !formData.name) return;
+        if (currentStep === 1 && !formData.email) return;
+        if (currentStep < steps.length - 1) setCurrentStep(prev => prev + 1);
+    };
+
+    const prevStep = () => {
+        if (currentStep > 0) setCurrentStep(prev => prev - 1);
+    };
+
+    const isLastStep = currentStep === steps.length - 1;
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!isLastStep) {
+            nextStep();
+            return;
+        }
         if (!formData.name || !formData.email || !formData.message) return;
         setStatus('sending');
 
@@ -176,6 +179,7 @@ const Contact: React.FC<ContactProps> = () => {
 
             setStatus('success');
             setFormData({ name: '', email: '', message: '' });
+            setCurrentStep(0);
             setTimeout(() => setStatus('idle'), 5000);
         } catch (err) {
             console.error('Submission error:', err);
@@ -201,7 +205,7 @@ const Contact: React.FC<ContactProps> = () => {
         borderBottom: `1px solid ${isFocused === id ? 'transparent' : 'var(--border-color)'}`,
         display: 'block',
         padding: '1.5rem 0',
-        fontSize: '1.1rem',
+        fontSize: '1.4rem',
         color: 'var(--text-color)',
         outline: 'none',
         fontFamily: 'var(--font-primary)',
@@ -217,7 +221,14 @@ const Contact: React.FC<ContactProps> = () => {
         <section
             id="contact"
             className="contact-section"
-            style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-color)', position: 'relative', zIndex: 2, boxSizing: 'border-box' }}
+            style={{
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-color)',
+                position: 'relative',
+                zIndex: 2,
+                boxSizing: 'border-box',
+                paddingTop: 'var(--section-py)'
+            }}
         >
             <div className="container">
                 <div className="contact-grid">
@@ -231,7 +242,7 @@ const Contact: React.FC<ContactProps> = () => {
                     >
                         <motion.span
                             variants={itemVariants}
-                            style={{ fontSize: '10px', letterSpacing: '0.4em', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginBottom: '1.2rem', opacity: 0.4 }}
+                            style={{ fontSize: '10px', letterSpacing: '0.4em', textTransform: 'uppercase', fontWeight: 600, display: 'block', marginBottom: '1.2rem', opacity: 0.7 }}
                         >
                             07 / THE UPLINK
                         </motion.span>
@@ -243,6 +254,79 @@ const Contact: React.FC<ContactProps> = () => {
                             Whether it's a new <span style={{ color: 'var(--accent-color)' }}>system architecture</span>, a complex <span style={{ color: 'var(--accent-color)' }}>web engine</span>, or a <span style={{ color: 'var(--accent-color)' }}>creative design discovery</span>,
                             I'm ready to collaborate. Let's build something that <span style={{ color: 'var(--accent-color)' }}>scales</span>.
                         </motion.p>
+
+
+                        {/* Number & Map Row Integration — hidden on homepage */}
+                        {!hideExtras && (
+                            <motion.div
+                                variants={itemVariants}
+                                style={{
+                                    marginTop: '2.5rem',
+                                    width: '100%',
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                                    gap: '1rem',
+                                    alignItems: 'stretch',
+                                    maxWidth: '500px'
+                                }}
+                            >
+                                {/* Number Box */}
+                                <div style={{
+                                    padding: '1.5rem',
+                                    backgroundColor: 'rgba(var(--text-color-rgb), 0.03)',
+                                    border: '1px solid var(--border-color)',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'space-between',
+                                    minHeight: '160px',
+                                    boxSizing: 'border-box'
+                                }}>
+                                    <span style={{ fontSize: '9px', fontWeight: 800, opacity: 0.3, letterSpacing: '0.2rem', textTransform: 'uppercase' }}>VOICE_CHANNEL</span>
+                                    <a href="tel:+88001887695162" style={{
+                                        fontSize: 'clamp(1rem, 1.5vw, 1.2rem)',
+                                        fontWeight: 700,
+                                        color: '#ff4212',
+                                        textDecoration: 'none',
+                                        letterSpacing: '-0.02em',
+                                        marginTop: 'auto'
+                                    }}>
+                                        +880 01887695162
+                                    </a>
+                                </div>
+
+                                {/* Map Box */}
+                                <div style={{
+                                    backgroundColor: 'rgba(var(--text-color-rgb), 0.05)',
+                                    border: '1px solid var(--border-color)',
+                                    overflow: 'hidden',
+                                    position: 'relative',
+                                    minHeight: '160px'
+                                }}>
+                                    <iframe
+                                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58356.12450868843!2d90.21985399999999!3d23.9158586!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755e905260f8981%3A0xe6792f3929424e75!2sSavar!5e0!3m2!1sen!2sbd!4v1710000000000!5m2!1sen!2sbd"
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0, filter: 'grayscale(1) invert(0.9) contrast(1.2) opacity(0.6)' }}
+                                        allowFullScreen={false}
+                                        loading="lazy"
+                                        referrerPolicy="no-referrer-when-downgrade"
+                                    />
+                                    <div style={{
+                                        position: 'absolute',
+                                        bottom: '10px',
+                                        right: '10px',
+                                        fontSize: '8px',
+                                        fontWeight: 800,
+                                        opacity: 0.4,
+                                        letterSpacing: '0.1em',
+                                        backgroundColor: 'var(--bg-color)',
+                                        padding: '4px 8px'
+                                    }}>
+                                        SAVAR_DHAKA
+                                    </div>
+                                </div>
+                            </motion.div>
+                        )}
                     </motion.div>
 
                     {/* RIGHT */}
@@ -253,7 +337,29 @@ const Contact: React.FC<ContactProps> = () => {
                         variants={containerVariants}
                         className="contact-content-side"
                     >
-                        <motion.div variants={itemVariants} className="contact-form-container">
+                        <motion.div variants={itemVariants} className="contact-form-container" style={{ position: 'relative' }}>
+                            {/* Progress bar (only for step variant) */}
+                            {variant === 'step' && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '2px',
+                                    backgroundColor: 'rgba(var(--text-color-rgb), 0.05)',
+                                    zIndex: 10
+                                }}>
+                                    <motion.div
+                                        animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+                                        style={{
+                                            height: '100%',
+                                            backgroundColor: '#ff4212',
+                                            boxShadow: '0 0 10px #ff4212'
+                                        }}
+                                    />
+                                </div>
+                            )}
+
                             {/* Background FX */}
                             <div style={{ position: 'absolute', inset: 0, zIndex: 0, pointerEvents: 'none', overflow: 'hidden' }}>
                                 <div style={{ position: 'absolute', inset: 0, opacity: 0.3 }}>
@@ -273,107 +379,161 @@ const Contact: React.FC<ContactProps> = () => {
                                         ))}
                                     </svg>
                                 </div>
-                                <motion.div
-                                    animate={{ opacity: isFocused ? 0.15 : 0, scale: isFocused ? 1 : 0.8 }}
-                                    style={{
-                                        position: 'absolute',
-                                        width: '400px', height: '400px',
-                                        background: 'radial-gradient(circle, #ff4212 0%, transparent 70%)',
-                                        filter: 'blur(40px)',
-                                        left: '50%',
-                                        top: isFocused === 'name' ? '15%' : isFocused === 'email' ? '35%' : '60%',
-                                        transform: 'translate(-50%, -50%)',
-                                        transition: 'top 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
-                                    }}
-                                />
                             </div>
 
-                            <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'grid', gap: '2.5rem', position: 'relative', zIndex: 1 }}>
-                                {/* Name */}
-                                <div style={{ position: 'relative' }}>
-                                    <motion.span
-                                        animate={{ opacity: isFocused === 'name' ? 0.8 : 0.2, color: isFocused === 'name' ? '#ff4212' : 'var(--text-color)' }}
-                                        style={{ fontSize: '9px', fontWeight: 900, position: 'absolute', top: '-0.8rem', left: 0, letterSpacing: '0.1em' }}
-                                    >
-                                        01_IDENTIFICATION
-                                    </motion.span>
-                                    <input
-                                        type="text"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleChange}
-                                        placeholder="Full Name"
-                                        required
-                                        style={inputStyle('name') as any}
-                                        onFocus={() => setIsFocused('name')}
-                                        onBlur={() => setIsFocused(null)}
-                                    />
-                                    {isFocused === 'name' && (
-                                        <motion.div layoutId="contact-focus-line" transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                                            style={{ position: 'absolute', bottom: '-1px', left: 0, height: '2px', backgroundColor: '#ff4212', width: '100%', zIndex: 3 }}
-                                        />
-                                    )}
-                                </div>
+                            <form
+                                ref={formRef}
+                                onSubmit={handleSubmit}
+                                style={{
+                                    minHeight: variant === 'step' ? 'clamp(320px, 40vh, 400px)' : 'auto',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    position: 'relative',
+                                    zIndex: 1,
+                                    padding: '0'
+                                }}
+                            >
+                                <div style={{ flex: 1 }}>
+                                    {variant === 'step' ? (
+                                        <AnimatePresence mode="wait">
+                                            <motion.div
+                                                key={currentStep}
+                                                initial={{ x: 20, opacity: 0 }}
+                                                animate={{ x: 0, opacity: 1 }}
+                                                exit={{ x: -20, opacity: 0 }}
+                                                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                                            >
+                                                <div style={{ marginBottom: '2.5rem' }}>
+                                                    <label htmlFor={`${steps[currentStep].id}-input`}>
+                                                        <motion.span
+                                                            animate={{ opacity: 0.8, color: '#ff4212' }}
+                                                            style={{ fontSize: '10px', fontWeight: 900, display: 'block', letterSpacing: '0.2rem', marginBottom: '1rem', textTransform: 'uppercase' }}
+                                                        >
+                                                            {steps[currentStep].label}
+                                                        </motion.span>
+                                                    </label>
+                                                    {steps[currentStep].type === 'textarea' ? (
+                                                        <textarea
+                                                            id={`${steps[currentStep].id}-input`}
+                                                            name={steps[currentStep].id}
+                                                            value={formData[steps[currentStep].id as keyof typeof formData]}
+                                                            onChange={handleChange}
+                                                            placeholder={steps[currentStep].placeholder}
+                                                            required
+                                                            style={{ ...inputStyle(steps[currentStep].id), minHeight: '180px', resize: 'none' } as any}
+                                                            onFocus={() => setIsFocused(steps[currentStep].id)}
+                                                            onBlur={() => setIsFocused(null)}
+                                                        />
+                                                    ) : (
+                                                        <input
+                                                            id={`${steps[currentStep].id}-input`}
+                                                            type={steps[currentStep].type}
+                                                            name={steps[currentStep].id}
+                                                            value={formData[steps[currentStep].id as keyof typeof formData]}
+                                                            onChange={handleChange}
+                                                            placeholder={steps[currentStep].placeholder}
+                                                            required
+                                                            style={inputStyle(steps[currentStep].id) as any}
+                                                            onFocus={() => setIsFocused(steps[currentStep].id)}
+                                                            onBlur={() => setIsFocused(null)}
+                                                        />
+                                                    )}
+                                                    <motion.div
+                                                        layoutId="contact-focus-line"
+                                                        style={{ height: '2px', backgroundColor: '#ff4212', width: '100%', marginTop: '-1px' }}
+                                                    />
+                                                </div>
 
-                                {/* Email */}
-                                <div style={{ position: 'relative' }}>
-                                    <motion.span
-                                        animate={{ opacity: isFocused === 'email' ? 0.8 : 0.2, color: isFocused === 'email' ? '#ff4212' : 'var(--text-color)' }}
-                                        style={{ fontSize: '9px', fontWeight: 900, position: 'absolute', top: '-0.8rem', left: 0, letterSpacing: '0.1em' }}
-                                    >
-                                        02_COMM_CHANNEL
-                                    </motion.span>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        placeholder="Email Address"
-                                        required
-                                        style={inputStyle('email') as any}
-                                        onFocus={() => setIsFocused('email')}
-                                        onBlur={() => setIsFocused(null)}
-                                    />
-                                    {isFocused === 'email' && (
-                                        <motion.div layoutId="contact-focus-line" transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                                            style={{ position: 'absolute', bottom: '-1px', left: 0, height: '2px', backgroundColor: '#ff4212', width: '100%', zIndex: 3 }}
-                                        />
-                                    )}
-                                </div>
-
-                                {/* Message */}
-                                <div style={{ position: 'relative' }}>
-                                    <motion.span
-                                        animate={{ opacity: isFocused === 'message' ? 0.8 : 0.2, color: isFocused === 'message' ? '#ff4212' : 'var(--text-color)' }}
-                                        style={{ fontSize: '9px', fontWeight: 900, position: 'absolute', top: '-0.8rem', left: 0, letterSpacing: '0.1em' }}
-                                    >
-                                        03_MISSION_OBJECTIVES
-                                    </motion.span>
-                                    <textarea
-                                        name="message"
-                                        value={formData.message}
-                                        onChange={handleChange}
-                                        placeholder="Define your mission..."
-                                        required
-                                        style={{ ...inputStyle('message'), minHeight: '160px', resize: 'none' } as any}
-                                        onFocus={() => setIsFocused('message')}
-                                        onBlur={() => setIsFocused(null)}
-                                    />
-                                    {isFocused === 'message' && (
-                                        <motion.div layoutId="contact-focus-line" transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                                            style={{ position: 'absolute', bottom: '-1px', left: 0, height: '2px', backgroundColor: '#ff4212', width: '100%', zIndex: 3 }}
-                                        />
+                                                <div style={{ fontSize: '9px', fontWeight: 800, opacity: 0.3, letterSpacing: '0.1em' }}>
+                                                    STEP_0{currentStep + 1} / 0{steps.length}
+                                                </div>
+                                            </motion.div>
+                                        </AnimatePresence>
+                                    ) : (
+                                        <div style={{ display: 'grid', gap: '2rem' }}>
+                                            {steps.map((step) => (
+                                                <div key={step.id} style={{ position: 'relative' }}>
+                                                    <label htmlFor={`${step.id}-input`}>
+                                                        <motion.span
+                                                            animate={{ opacity: isFocused === step.id ? 0.8 : 0.2, color: isFocused === step.id ? '#ff4212' : 'var(--text-color)' }}
+                                                            style={{ fontSize: '9px', fontWeight: 900, position: 'absolute', top: '-0.8rem', left: 0, letterSpacing: '0.1em' }}
+                                                        >
+                                                            {step.label}
+                                                        </motion.span>
+                                                    </label>
+                                                    {step.type === 'textarea' ? (
+                                                        <textarea
+                                                            id={`${step.id}-input`}
+                                                            name={step.id}
+                                                            value={formData[step.id as keyof typeof formData]}
+                                                            onChange={handleChange}
+                                                            placeholder={step.placeholder}
+                                                            required
+                                                            style={{ ...inputStyle(step.id), minHeight: '160px', resize: 'none' } as any}
+                                                            onFocus={() => setIsFocused(step.id)}
+                                                            onBlur={() => setIsFocused(null)}
+                                                        />
+                                                    ) : (
+                                                        <input
+                                                            id={`${step.id}-input`}
+                                                            type={step.type}
+                                                            name={step.id}
+                                                            value={formData[step.id as keyof typeof formData]}
+                                                            onChange={handleChange}
+                                                            placeholder={step.placeholder}
+                                                            required
+                                                            style={inputStyle(step.id) as any}
+                                                            onFocus={() => setIsFocused(step.id)}
+                                                            onBlur={() => setIsFocused(null)}
+                                                        />
+                                                    )}
+                                                    {isFocused === step.id && (
+                                                        <motion.div layoutId="contact-focus-line"
+                                                            style={{ position: 'absolute', bottom: '-1px', left: 0, height: '2px', backgroundColor: '#ff4212', width: '100%', zIndex: 3 }}
+                                                        />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     )}
                                 </div>
 
                                 {/* Footer row */}
-                                <div className="contact-form-bottom">
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                                        <span style={{ fontSize: '8px', fontWeight: 900, opacity: 0.2, letterSpacing: '0.2rem' }}>SYSTEM_TIME</span>
-                                        <span style={{ fontSize: '12px', fontWeight: 800 }}>{time.toLocaleTimeString()} UTC+6</span>
+                                <div className="contact-form-bottom" style={{ marginTop: variant === 'step' ? 'auto' : '2.5rem' }}>
+                                    <div style={{ display: 'flex', gap: '12px' }}>
+                                        {variant === 'step' ? (
+                                            <>
+                                                {currentStep > 0 && (
+                                                    <HoverButton
+                                                        type="button"
+                                                        onClick={prevStep}
+                                                        variant="outline"
+                                                        style={{ height: '50px', padding: '0 2rem' }}
+                                                    >
+                                                        PREV
+                                                    </HoverButton>
+                                                )}
+                                                {!isLastStep ? (
+                                                    <HoverButton
+                                                        type="button"
+                                                        onClick={nextStep}
+                                                        variant="solid"
+                                                        style={{ height: '50px', padding: '0 2.5rem' }}
+                                                    >
+                                                        CONTINUE
+                                                    </HoverButton>
+                                                ) : (
+                                                    <SubmitButton status={status} />
+                                                )}
+                                            </>
+                                        ) : (
+                                            <SubmitButton status={status} />
+                                        )}
                                     </div>
-                                    <div style={{ width: 'auto' }}>
-                                        <SubmitButton status={status} />
+
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', textAlign: 'right' }}>
+                                        <span style={{ fontSize: '8px', fontWeight: 900, opacity: 0.2, letterSpacing: '0.2rem' }}>BUFFER_SYNC</span>
+                                        <span style={{ fontSize: '12px', fontWeight: 800 }}>{time.toLocaleTimeString()} UTC+6</span>
                                     </div>
                                 </div>
                             </form>

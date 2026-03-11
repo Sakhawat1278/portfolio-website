@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import HoverButton from '../components/HoverButton';
 
-interface HeroProps {
-    isReady: boolean;
-}
+const Hero: React.FC = () => {
+    const [isReady, setIsReady] = useState(false);
+    const videoRef1 = useRef<HTMLVideoElement>(null);
+    const videoRef2 = useRef<HTMLVideoElement>(null);
 
-const Hero: React.FC<HeroProps> = ({ isReady }) => {
+    useEffect(() => {
+        // Snappy Load: Show headline/text immediately after mount
+        setIsReady(true);
+
+        // Immediate Buffering & Playback to solve "slow loading" report
+        videoRef1.current?.play().catch(() => { });
+        videoRef2.current?.play().catch(() => { });
+    }, []);
+
     const title = "CREATIVE ALWAYS";
 
     return (
@@ -19,7 +28,9 @@ const Hero: React.FC<HeroProps> = ({ isReady }) => {
                 backgroundColor: 'var(--bg-color)',
                 paddingTop: 'var(--header-height)',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                minHeight: '100vh', // Ensure no collapse
+                overflow: 'hidden'
             }}
         >
             {/* ── Row 1: Headline + Video ── */}
@@ -49,11 +60,11 @@ const Hero: React.FC<HeroProps> = ({ isReady }) => {
                 >
                     {/* Headline + dot */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                        <h2 className="hero-headline">
-                            DESIGN STUDIO<br />
-                            FOR <span style={{ color: 'var(--accent-color)' }}>TIMELESS</span><br />
-                            BRANDING.
-                        </h2>
+                        <h1 className="hero-headline">
+                            WORDPRESS<br />
+                            EXPERT & <span style={{ color: 'var(--accent-color)' }}>RAW CODE</span><br />
+                            ENGINEER.
+                        </h1>
 
                         {/* Orange live dot */}
                         <div style={{ position: 'relative', marginTop: '0.25em', flexShrink: 0 }}>
@@ -76,38 +87,54 @@ const Hero: React.FC<HeroProps> = ({ isReady }) => {
                         </div>
                     </div>
 
-                    {/* Mobile-only: square video between headline and buttons */}
-                    <motion.div
-                        className="hero-video-mobile"
-                        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-                        animate={isReady ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : {}}
-                        transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as any, delay: 0.4 }}
-                    >
+                    {/* Responsive Video Container (Shown on Tablet/Mobile) */}
+                    <div className="hero-video-inline">
                         <video
-                            src="/Wireframe.mp4"
-                            autoPlay muted loop playsInline
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            ref={videoRef1}
+                            src="/Wireframe1.webm"
+                            muted
+                            loop
+                            playsInline
+                            disablePictureInPicture
+                            preload="auto"
+                            width="500"
+                            height="500"
+                            aria-hidden="true"
+                            style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }}
                         />
-                    </motion.div>
+                    </div>
 
                     {/* Buttons */}
-                    <div className="hero-buttons">
-                        <HoverButton href="#works" variant="solid">EXPLORE_WORKS</HoverButton>
-                        <HoverButton href="#contact" variant="outline">START_MISSION</HoverButton>
+                    <div className="hero-buttons" style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        flexWrap: 'nowrap',
+                        gap: '12px'
+                    }}>
+                        <HoverButton href="/works" variant="solid">EXPLORE_WORKS</HoverButton>
+                        <HoverButton href="/contact" variant="outline">START_MISSION</HoverButton>
                     </div>
                 </motion.div>
 
-                {/* RIGHT: Square video — tablet + desktop */}
+                {/* Right Video (Shown only on Large Desktop) */}
                 <motion.div
-                    className="hero-video-desktop"
-                    initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-                    animate={isReady ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : { opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+                    className="hero-video-aside"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={isReady ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.95 }}
                     transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] as any, delay: 0.4 }}
                 >
                     <video
-                        src="/Wireframe.mp4"
-                        autoPlay muted loop playsInline
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        ref={videoRef2}
+                        src="/Wireframe1.webm"
+                        muted
+                        loop
+                        playsInline
+                        disablePictureInPicture
+                        preload="auto"
+                        width="500"
+                        height="500"
+                        aria-hidden="true"
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '16px' }}
                     />
                 </motion.div>
             </div>
@@ -130,30 +157,27 @@ const Hero: React.FC<HeroProps> = ({ isReady }) => {
                     }}
                 />
 
-                <div className="hero-marquee-inner">
+                <div className="hero-marquee-inner" style={{ display: 'flex', gap: '0.4em' }}>
                     {title.split(" ").map((word, wordIdx) => (
-                        <div key={wordIdx} style={{ display: 'flex' }}>
-                            {word.split("").map((char, charIdx) => (
-                                <div key={charIdx} style={{ overflow: 'hidden', display: 'flex' }}>
-                                    <motion.span
-                                        className="hero-marquee-char"
-                                        initial={{ y: '100%' }}
-                                        animate={isReady ? { y: 0 } : { y: '100%' }}
-                                        transition={{
-                                            duration: 1.2,
-                                            ease: [0.16, 1, 0.3, 1],
-                                            delay: 0.8 + (wordIdx * 0.1) + (charIdx * 0.03)
-                                        }}
-                                    >
-                                        {char}
-                                    </motion.span>
-                                </div>
-                            ))}
+                        <div key={wordIdx} style={{ overflow: 'hidden', display: 'flex' }}>
+                            <motion.span
+                                className="hero-marquee-word"
+                                initial={{ y: '102%' }}
+                                animate={isReady ? { y: 0 } : { y: '102%' }}
+                                transition={{
+                                    duration: 0.8,
+                                    ease: [0.16, 1, 0.3, 1],
+                                    delay: 0.6 + (wordIdx * 0.15)
+                                }}
+                                style={{ display: 'inline-block' }}
+                            >
+                                {word}
+                            </motion.span>
                         </div>
                     ))}
                 </div>
             </div>
-        </section>
+        </section >
     );
 };
 

@@ -294,7 +294,7 @@ const AnimatedHeading = ({ text }: { text: string }) => {
             whileInView="visible"
             viewport={{ once: true, amount: 0.5 }}
             style={{
-                fontSize: 'clamp(2.2rem, 8vw, 6rem)',
+                fontSize: 'clamp(2.2rem, 8vw, 5rem)',
                 fontWeight: 800,
                 lineHeight: 1.1,
                 letterSpacing: '-0.03em',
@@ -330,9 +330,11 @@ const AnimatedHeading = ({ text }: { text: string }) => {
 
 interface AboutProps {
     theme?: 'light' | 'dark';
+    showMethodology?: boolean;
+    showStats?: boolean;
 }
 
-const About: React.FC<AboutProps> = ({ theme }) => {
+const About: React.FC<AboutProps> = ({ theme, showMethodology = true, showStats = true }) => {
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -395,7 +397,7 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                                 fontWeight: 600,
                                 display: 'block',
                                 marginBottom: '1.2rem',
-                                opacity: 0.4
+                                opacity: 0.6
                             }}
                         >
                             01 / THE ARCHITECT
@@ -423,8 +425,11 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                             }}
                         >
                             <motion.img
-                                src="/My_Self-2.png"
+                                src="/My_Self-2.webp"
                                 alt="Sohan Hossain Portrait"
+                                width="650"
+                                height="650"
+                                loading="lazy"
                                 initial={{ scale: 1.1, filter: 'grayscale(1) brightness(0.4)' }}
                                 whileInView={{
                                     scale: 1,
@@ -465,8 +470,8 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                             {/* Decorative Label */}
                             <div style={{
                                 position: 'absolute',
-                                bottom: '40px',
-                                left: '40px',
+                                bottom: 'var(--section-px, 20px)',
+                                left: 'var(--section-px, 20px)',
                                 fontSize: '10px',
                                 letterSpacing: '0.3em',
                                 color: '#ff4212',
@@ -475,8 +480,7 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                                 textTransform: 'uppercase'
                             }}>
                                 SOHAN UX
-                            </div>
-                        </motion.div>
+                            </div>                        </motion.div>
 
                         {/* Relocated Intro Paragraph */}
                         <motion.p
@@ -490,7 +494,7 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                                 opacity: 0.9
                             }}
                         >
-                            I am <span style={{ color: 'var(--accent-color)', fontWeight: 700 }}>Sakhawat Hossain Sohan</span>, a Full-Stack Systems Engineer and BSc CSE graduate with <span style={{ color: 'var(--accent-color)', fontWeight: 600 }}>3+ years of professional experience</span>. I bridge the gap between low-level system performance (C/C++, Java) and high-level creative manifesting through **Vibe Code**.
+                            I am <span style={{ color: 'var(--accent-color)', fontWeight: 700 }}>Sakhawat Hossain Sohan</span>, a Full-Stack Systems Engineer and BSc CSE graduate with <span style={{ color: 'var(--accent-color)', fontWeight: 600 }}>3+ years of professional experience</span>. I bridge the gap between low-level system performance (C/C++, Java) and high-level creative manifesting through <span style={{ fontWeight: 600 }}>WordPress Plugin Engineering</span> and Vibe Code.
                         </motion.p>
 
                         <motion.p
@@ -503,7 +507,7 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                                 opacity: 0.9
                             }}
                         >
-                            My mission is to deliver **industrial-grade software** that scales infinitely. By leveraging **Ultra-Level AI** and **Business Growth strategies**, I transform complex technical problems into seamless, revenue-driving digital ecosystems.
+                            Equipped with a degree from <span style={{ fontWeight: 600 }}>Daffodil International University</span>, my mission is to deliver industrial-grade software that scales. I transform complex problems into seamless digital ecosystems.
                         </motion.p>
 
                         <motion.p
@@ -513,19 +517,18 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                                 fontWeight: 300,
                                 lineHeight: 1.8,
                                 marginBottom: '3rem',
-                                opacity: 0.6
+                                opacity: 0.7
                             }}
                         >
                             Specializing in <span style={{ color: 'var(--accent-color)' }}>C/C++</span>, <span style={{ color: 'var(--accent-color)' }}>Java</span>, and advanced
-                            <span style={{ color: 'var(--accent-color)' }}> web technologies</span>, I architect systems that excel in performance and reliability.
-                            Every line of code is a deliberate step toward architectural perfection.
+                            <span style={{ color: 'var(--accent-color)' }}> WP Plugin Architecture</span>, I architect systems that excel in performance and reliability.
                         </motion.p>
 
                         <motion.div
                             variants={itemVariants}
                             style={{
                                 display: 'grid',
-                                gridTemplateColumns: '1fr 1fr',
+                                gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
                                 gap: '2rem',
                                 width: '100%'
                             }}
@@ -533,18 +536,18 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                             <div>
                                 <h4 style={{ fontSize: '11px', fontWeight: 600, marginBottom: '1rem', opacity: 0.9, letterSpacing: '0.1em' }}>EXPERTISE</h4>
                                 <ul style={{ listStyle: 'none', padding: 0, fontSize: '13px', opacity: 0.7, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                                    <li>SYSTEM ARCHITECTURE</li>
-                                    <li>VIBE CODE ENGINEERING</li>
+                                    <li>WP PLUGIN ARCHITECTURE</li>
+                                    <li>SYSTEM CORE (C/C++, JAVA)</li>
+                                    <li>MODERN WEB ECOSYSTEMS</li>
                                     <li>ULTRA AI AUTOMATION</li>
-                                    <li>GROWTH LOOPS & SCALING</li>
                                 </ul>
                             </div>
                             <div>
                                 <h4 style={{ fontSize: '11px', fontWeight: 600, marginBottom: '1rem', opacity: 0.9, letterSpacing: '0.1em' }}>FOCUS</h4>
                                 <ul style={{ listStyle: 'none', padding: 0, fontSize: '13px', opacity: 0.7, display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                                    <li>AI AUTOMATION</li>
-                                    <li>VIRAL STRATEGIES</li>
-                                    <li>RAPID PROTOTYPING</li>
+                                    <li>SCALABLE ENGINES</li>
+                                    <li>BSc CSE RIGOR</li>
+                                    <li>INDUSTRIAL DESIGN</li>
                                     <li>GROWTH LOOPS</li>
                                 </ul>
                             </div>
@@ -553,44 +556,48 @@ const About: React.FC<AboutProps> = ({ theme }) => {
                 </div>
 
                 {/* Key Stats Section */}
-                <div style={{ marginTop: '8rem', marginBottom: '6rem', width: '100%' }}>
-                    <div className="about-stats-grid">
-                        {[
-                            { label: 'Years Experience', value: '03+' },
-                            { label: 'Efficiency Gain', value: '45%' },
-                            { label: 'Codebase Lines', value: '1.2M' },
-                            { label: 'Growth Surge', value: '250%' }
-                        ].map((stat, index) => (
-                            <StatCounter key={stat.label} value={stat.value} label={stat.label} index={index} />
-                        ))}
+                {showStats && (
+                    <div className="about-stats-container" style={{ marginTop: '8rem', marginBottom: '6rem', width: '100%' }}>
+                        <div className="about-stats-grid">
+                            {[
+                                { label: 'Years Experience', value: '03+' },
+                                { label: 'Efficiency Gain', value: '45%' },
+                                { label: 'Codebase Lines', value: '1.2M' },
+                                { label: 'Growth Surge', value: '250%' }
+                            ].map((stat, index) => (
+                                <StatCounter key={stat.label} value={stat.value} label={stat.label} index={index} />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
                 {/* Working Methodology Section */}
-                <div style={{ marginTop: '5rem', width: '100%' }}>
-                    <motion.span
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 0.4 }}
-                        viewport={{ once: true }}
-                        style={{
-                            fontSize: '10px',
-                            letterSpacing: '0.4em',
-                            textTransform: 'uppercase',
-                            fontWeight: 600,
-                            display: 'block',
-                            marginBottom: '4rem',
-                            textAlign: 'center'
-                        }}
-                    >
-                        Working Methodology
-                    </motion.span>
+                {showMethodology && (
+                    <div style={{ marginTop: '5rem', width: '100%' }}>
+                        <motion.span
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 0.4 }}
+                            viewport={{ once: true }}
+                            style={{
+                                fontSize: '10px',
+                                letterSpacing: '0.4em',
+                                textTransform: 'uppercase',
+                                fontWeight: 600,
+                                display: 'block',
+                                marginBottom: '4rem',
+                                textAlign: 'center'
+                            }}
+                        >
+                            Working Methodology
+                        </motion.span>
 
-                    <div className="about-process-grid" style={{ borderTop: '1px solid var(--border-color)', borderLeft: '1px solid var(--border-color)' }}>
-                        {processSteps.map((step) => (
-                            <ProcessCard key={step.id} step={step} />
-                        ))}
+                        <div className="about-process-grid" style={{ borderTop: '1px solid var(--border-color)', borderLeft: '1px solid var(--border-color)' }}>
+                            {processSteps.map((step) => (
+                                <ProcessCard key={step.id} step={step} />
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </section >
     );

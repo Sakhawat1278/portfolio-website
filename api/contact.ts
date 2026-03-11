@@ -153,9 +153,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Send Auto-Reply to User
         await transporter.sendMail({
-            from: `"Sakahwat Hossain Sohan" <${SMTP_USER}>`,
+            from: `"Sakhawat Hossain Sohan" <${SMTP_USER}>`,
+            replyTo: SMTP_USER,
             to: email,
-            subject: `✅ Your message has been received — SOHAN UX`,
+            subject: `Message Received — Sakhawat Hossain Sohan`,
             html: replyHtml,
         });
 

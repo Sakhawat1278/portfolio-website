@@ -66,7 +66,7 @@ const SkillPill = React.memo(({ skill }: { skill: Skill }) => (
             letterSpacing: '0.05em',
             padding: '5px 13px',
             border: '1px solid var(--border-color)',
-            borderRadius: '3px',
+            borderRadius: '0',
             backgroundColor: 'rgba(var(--text-color-rgb), 0.03)',
             flexShrink: 0,
             whiteSpace: 'nowrap',
@@ -74,7 +74,7 @@ const SkillPill = React.memo(({ skill }: { skill: Skill }) => (
     >
         <img
             src={skill.icon}
-            alt=""
+            alt={`${skill.name} icon`}
             width={13}
             height={13}
             loading="lazy"
@@ -92,8 +92,9 @@ const SkillPill = React.memo(({ skill }: { skill: Skill }) => (
 
 /* ─── MARQUEE ROW ─────────────────────────────────────────────────────────── */
 const SkillRow = React.memo(({ category, index }: { category: typeof categories[0], index: number }) => {
-    const doubled = [...category.items, ...category.items];
-    const duration = 30 + index * 5;
+    // Repeat items to ensure full width coverage on all screens
+    const repeatedItems = [...category.items, ...category.items, ...category.items, ...category.items, ...category.items, ...category.items];
+    const duration = 25 + index * 5;
 
     return (
         <motion.div
@@ -112,11 +113,13 @@ const SkillRow = React.memo(({ category, index }: { category: typeof categories[
         >
             <div style={{
                 flexShrink: 0,
-                width: 'clamp(90px, 11vw, 145px)',
-                padding: '1rem 1.2rem 1rem 0',
+                width: 'clamp(100px, 12vw, 160px)',
+                padding: '1.2rem 1.2rem 1.2rem 0',
                 borderRight: '1px solid var(--border-color)',
                 backgroundColor: 'var(--bg-color)',
-                zIndex: 5
+                zIndex: 5,
+                display: 'flex',
+                alignItems: 'center'
             }}>
                 <span style={{ fontSize: '7.5px', fontWeight: 900, letterSpacing: '0.2em', opacity: 0.28, textTransform: 'uppercase', display: 'block' }}>
                     {category.label}
@@ -130,9 +133,9 @@ const SkillRow = React.memo(({ category, index }: { category: typeof categories[
                 <motion.div
                     animate={{ x: category.dir === -1 ? ['0%', '-50%'] : ['-50%', '0%'] }}
                     transition={{ duration, repeat: Infinity, ease: 'linear' }}
-                    style={{ display: 'flex', gap: '8px', willChange: 'transform' }}
+                    style={{ display: 'flex', gap: '10px', willChange: 'transform' }}
                 >
-                    {doubled.map((skill, i) => (
+                    {repeatedItems.map((skill, i) => (
                         <SkillPill key={`${skill.name}-${i}`} skill={skill} />
                     ))}
                 </motion.div>
@@ -179,10 +182,11 @@ const TechStack: React.FC = React.memo(() => {
                             viewport={{ once: true }}
                             transition={{ delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
                             style={{
-                                fontSize: 'clamp(3rem, 7vw, 7.5rem)',
+                                fontSize: 'clamp(2.2rem, 7vw, 5rem)',
                                 fontWeight: 900,
                                 lineHeight: 0.85,
                                 letterSpacing: '-0.05em',
+                                opacity: 0.7,
                                 margin: 0,
                                 textTransform: 'uppercase',
                             }}
@@ -227,8 +231,8 @@ const TechStack: React.FC = React.memo(() => {
                         <SkillRow key={cat.label} category={cat} index={i} />
                     ))}
                 </div>
-            </div>
-        </section>
+            </div >
+        </section >
     );
 });
 

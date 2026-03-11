@@ -114,7 +114,9 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                     >
                         <img
                             src={theme === 'light' ? '/New_logo_white.png' : '/New_logo_dark.png'}
-                            alt="Sohan Brand"
+                            alt="Sakhawat Hossain Sohan - Portfolio Logo"
+                            width="160"
+                            height="35"
                             style={{
                                 height: '35px',
                                 width: 'auto',
@@ -180,7 +182,9 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                         >
                             <img
                                 src={theme === 'light' ? '/New_logo_white.png' : '/New_logo_dark.png'}
-                                alt="Sohan Brand"
+                                alt="Sakhawat Hossain Sohan - Technology & Design Portfolio"
+                                width="300"
+                                height="75"
                                 style={{
                                     height: 'clamp(40px, 6vw, 75px)',
                                     width: 'auto',
@@ -204,7 +208,7 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                     }}
                 >
                     <motion.div className="footer-grid-item" variants={itemVariants}>
-                        <h4 style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>SERVICES</h4>
+                        <h4 className="footer-grid-title" style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>SERVICES</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', opacity: 0.9, alignItems: 'inherit' }}>
                             {['UX / UI Design', 'Visual Identity', 'Web Engineering', 'Interaction Design'].map((s) => (
                                 <span key={s} style={{ fontSize: '14px', fontWeight: 400 }}>{s}</span>
@@ -213,23 +217,47 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                     </motion.div>
 
                     <motion.div className="footer-grid-item" variants={itemVariants}>
-                        <h4 style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>NAVIGATION</h4>
+                        <h4 className="footer-grid-title" style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>NAVIGATION</h4>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', alignItems: 'inherit' }}>
                             {[
-                                { label: 'Philosophy', id: 'about' },
-                                { label: 'Capabilities', id: 'services' },
-                                { label: 'Tech Stack', id: 'stack' },
-                                { label: 'Selected Works', id: 'works' },
-                                { label: 'Chronicles', id: 'experience' },
-                                { label: 'The Uplink', id: 'contact' }
-                            ].map((item) => (
-                                <a key={item.id} href={`#${item.id}`} style={{ color: 'var(--text-color)', textDecoration: 'none', fontSize: '14px', width: 'fit-content', fontWeight: 400 }}>{item.label}</a>
+                                { label: 'Home', path: '/' },
+                                { label: 'My Works', path: '/works' },
+                                { label: 'About', path: '/about' },
+                                { label: 'Skills', path: '/skills' },
+                                { label: 'Contact', path: '/contact' }
+                            ].map((item, index) => (
+                                <a
+                                    key={item.path}
+                                    href={item.path}
+                                    style={{
+                                        color: 'var(--text-color)',
+                                        textDecoration: 'none',
+                                        fontSize: '14px',
+                                        width: 'fit-content',
+                                        fontWeight: 400,
+                                        display: 'flex',
+                                        alignItems: 'baseline',
+                                        gap: '10px',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                        e.currentTarget.style.color = 'var(--accent-color)';
+                                        e.currentTarget.style.paddingLeft = '6px';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.currentTarget.style.color = 'var(--text-color)';
+                                        e.currentTarget.style.paddingLeft = '0';
+                                    }}
+                                >
+                                    <span style={{ fontSize: '9px', fontWeight: 600, opacity: 0.3, fontFamily: 'monospace' }}>00{index + 1}</span>
+                                    {item.label}
+                                </a>
                             ))}
                         </div>
                     </motion.div>
 
                     <motion.div className="footer-grid-item" variants={itemVariants}>
-                        <h4 style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>CONNECT</h4>
+                        <h4 className="footer-grid-title" style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>CONNECT</h4>
                         <div style={{
                             display: 'flex',
                             flexDirection: 'row',
@@ -243,8 +271,9 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                                     href={social.url}
                                     target="_blank"
                                     rel="noopener noreferrer"
+                                    aria-label={social.name}
                                     title={social.name}
-                                    whileHover={{ scale: 1.1, color: '#ff4212' }}
+                                    whileHover={{ scale: 1.1, color: '#e63b00' }}
                                     style={{
                                         color: 'var(--text-color)',
                                         display: 'flex',
@@ -263,7 +292,7 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                     </motion.div>
 
                     <motion.div className="footer-grid-item" variants={itemVariants}>
-                        <h4 style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>OFFICE</h4>
+                        <h4 className="footer-grid-title" style={{ fontSize: '11px', fontWeight: 600, opacity: 0.4, marginBottom: '1.5rem', letterSpacing: '0.15em' }}>OFFICE</h4>
                         <p style={{ fontSize: '14px', opacity: 0.9, lineHeight: 1.6 }}>
                             Dhaka, Bangladesh<br />
                             Remote Globally<br />
@@ -325,7 +354,7 @@ const Footer: React.FC<FooterProps> = ({ theme }) => {
                         <div style={{
                             display: 'flex',
                             flexDirection: 'row',
-                            gap: '3rem',
+                            gap: '1.5rem',
                             opacity: 0.4,
                             fontSize: '10px',
                             letterSpacing: '0.1em'

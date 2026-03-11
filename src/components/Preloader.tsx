@@ -16,31 +16,32 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     const accentColor = '#ff4212';
 
     useEffect(() => {
-        const duration = 2400;
-        const startTime = Date.now();
+        const duration = 600;
+        const interval = 10; // High-precision updates but lower than 60fps raf
+        const steps = duration / interval;
+        let currentStep = 0;
 
-        const updateProgress = () => {
-            const elapsed = Date.now() - startTime;
-            const t = Math.min(elapsed / duration, 1);
-            const eased = Math.floor((1 - Math.pow(1 - t, 2.2)) * 100);
+        const timer = setInterval(() => {
+            currentStep++;
+            const t = Math.min(currentStep / steps, 1);
+            const eased = Math.floor((1 - Math.pow(1 - t, 2.5)) * 100);
+
             setProgress(eased);
 
-            if (t < 1) {
-                requestAnimationFrame(updateProgress);
-            } else {
+            if (currentStep >= steps) {
+                clearInterval(timer);
                 setTimeout(() => {
                     setIsComplete(true);
-                    setTimeout(onComplete, 1000);
-                }, 300);
+                    setTimeout(onComplete, 120);
+                }, 40);
             }
-        };
+        }, interval);
 
-        requestAnimationFrame(updateProgress);
+        return () => clearInterval(timer);
     }, [onComplete]);
 
     const paddedProgress = String(progress).padStart(2, '0');
-
-    const panelExit = { duration: 1.0, ease: [0.76, 0, 0.24, 1] as any };
+    const panelExit = { duration: 0.5, ease: [0.22, 1, 0.36, 1] as any };
 
     return (
         <AnimatePresence>
@@ -53,6 +54,8 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                         display: 'flex',
                         pointerEvents: 'auto',
                         overflow: 'hidden',
+                        willChange: 'opacity',
+                        contain: 'paint'
                     }}
                 >
                     {/* ── LEFT PANEL (dark) ── */}
@@ -69,6 +72,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                             justifyContent: 'space-between',
                             padding: '36px 40px',
                             overflow: 'hidden',
+                            willChange: 'transform'
                         }}
                     >
                         {/* Top-left label */}
@@ -111,8 +115,9 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                                     color: '#FFFFFF',
                                     fontVariantNumeric: 'tabular-nums',
                                     whiteSpace: 'nowrap',
-                                    // Clip left half: only show left portion of text
-                                    clipPath: 'inset(0 50% 0 0)',
+                                    // Clip left half: switch from clipPath to width/overflow for compositing
+                                    width: '100%',
+                                    display: 'block'
                                 }}
                             >
                                 {paddedProgress}
@@ -163,6 +168,7 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                             justifyContent: 'space-between',
                             padding: '36px 40px',
                             overflow: 'hidden',
+                            willChange: 'transform'
                         }}
                     >
                         {/* Top-right: orange dot */}
@@ -215,8 +221,10 @@ const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
                                     color: '#0A0A0A',
                                     fontVariantNumeric: 'tabular-nums',
                                     whiteSpace: 'nowrap',
-                                    // Clip right half
-                                    clipPath: 'inset(0 0 0 50%)',
+                                    // Clip right half: shift left and overflow
+                                    transform: 'translateX(-50%)',
+                                    width: '100%',
+                                    display: 'block'
                                 }}
                             >
                                 {paddedProgress}

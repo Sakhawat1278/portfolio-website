@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
+import HoverButton from './HoverButton';
 
 interface MenuProps {
     isOpen: boolean;
@@ -8,6 +10,7 @@ interface MenuProps {
 }
 
 const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
+    const location = useLocation();
     // Close menu on ESC key
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -84,26 +87,24 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
                                     gap: '4px'
                                 }}>
                                     {[
-                                        { label: 'Philosophy', id: 'about', number: '01' },
-                                        { label: 'Capabilities', id: 'services', number: '02' },
-                                        { label: 'Tech Stack', id: 'stack', number: '03' },
-                                        { label: 'Selected Works', id: 'works', number: '04' },
-                                        { label: 'Testimonials', id: 'testimonials', number: '05' },
-                                        { label: 'Chronicles', id: 'experience', number: '06' },
-                                        { label: 'The Uplink', id: 'contact', number: '07' }
+                                        { label: 'Home', path: '/', number: '01' },
+                                        { label: 'My Works', path: '/works', number: '02' },
+                                        { label: 'About', path: '/about', number: '03' },
+                                        { label: 'Skills', path: '/skills', number: '04' },
+                                        { label: 'Contact', path: '/contact', number: '05' }
                                     ].map((item, index) => (
                                         <motion.li
-                                            key={item.id}
+                                            key={item.path}
                                             initial={{ opacity: 0, x: 15 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.2 + (index * 0.05) }}
                                         >
-                                            <a
-                                                href={`#${item.id}`}
+                                            <Link
+                                                to={item.path}
                                                 onClick={onClose}
                                                 style={{
                                                     textDecoration: 'none',
-                                                    color: 'inherit',
+                                                    color: location.pathname === item.path ? 'var(--accent-color)' : 'inherit',
                                                     fontSize: 'clamp(24px, 4vw, 32px)',
                                                     fontWeight: 400,
                                                     display: 'flex',
@@ -112,54 +113,85 @@ const Menu: React.FC<MenuProps> = ({ isOpen, onClose }) => {
                                                     letterSpacing: '-0.02em',
                                                     transition: 'all 0.3s ease',
                                                     fontFamily: 'var(--font-primary)',
-                                                    padding: '6px 0'
+                                                    padding: '6px 0',
+                                                    paddingLeft: location.pathname === item.path ? '8px' : '0'
                                                 }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.color = 'var(--accent-color)';
-                                                    e.currentTarget.style.paddingLeft = '8px';
+                                                onMouseEnter={(e: any) => {
+                                                    if (location.pathname !== item.path) {
+                                                        e.currentTarget.style.color = 'var(--accent-color)';
+                                                        e.currentTarget.style.paddingLeft = '8px';
+                                                    }
                                                 }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.color = 'inherit';
-                                                    e.currentTarget.style.paddingLeft = '0';
+                                                onMouseLeave={(e: any) => {
+                                                    if (location.pathname !== item.path) {
+                                                        e.currentTarget.style.color = 'inherit';
+                                                        e.currentTarget.style.paddingLeft = '0';
+                                                    }
                                                 }}
                                             >
                                                 <span style={{ fontSize: '12px', fontWeight: 600, opacity: 0.3, fontFamily: 'monospace' }}>{item.number}</span>
                                                 {item.label}
-                                            </a>
+                                            </Link>
                                         </motion.li>
                                     ))}
                                 </ul>
                             </nav>
                         </div>
 
-                        {/* Social Section */}
-                        <div>
-                            <span style={{ fontSize: '10px', fontWeight: 800, opacity: 0.4, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '24px', display: 'block' }}>Socials</span>
-                            <div style={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                flexWrap: 'wrap',
-                                gap: '32px',
-                                fontSize: '14px',
-                                fontWeight: 500
-                            }}>
-                                {[
-                                    { name: 'Facebook', url: 'https://www.facebook.com/sakhawat.hossain.81427' },
-                                    { name: 'LinkedIn', url: 'https://www.linkedin.com/in/sakhawathossain1278' },
-                                    { name: 'GitHub', url: 'https://github.com/Sakhawat1278' }
-                                ].map((social) => (
-                                    <a
-                                        key={social.name}
-                                        href={social.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7, transition: 'opacity 0.3s' }}
-                                        onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
-                                        onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
-                                    >
-                                        {social.name}
-                                    </a>
-                                ))}
+                        {/* Social Section & CV */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                            <div>
+                                <span style={{ fontSize: '10px', fontWeight: 800, opacity: 0.4, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '24px', display: 'block' }}>Socials</span>
+
+                                <div style={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    flexWrap: 'wrap',
+                                    gap: '32px',
+                                    fontSize: '14px',
+                                    fontWeight: 500
+                                }}>
+                                    {[
+                                        { name: 'Facebook', url: 'https://www.facebook.com/sakhawat.hossain.81427' },
+                                        { name: 'LinkedIn', url: 'https://www.linkedin.com/in/sakhawathossain1278' },
+                                        { name: 'GitHub', url: 'https://github.com/Sakhawat1278' }
+                                    ].map((social) => (
+                                        <a
+                                            key={social.name}
+                                            href={social.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            style={{ color: 'inherit', textDecoration: 'none', opacity: 0.7, transition: 'opacity 0.3s' }}
+                                            onMouseEnter={(e) => e.currentTarget.style.opacity = '1'}
+                                            onMouseLeave={(e) => e.currentTarget.style.opacity = '0.7'}
+                                        >
+                                            {social.name}
+                                        </a>
+                                    ))}
+                                </div>
+
+                            </div>
+
+                            {/* CV Download integrated into Menu */}
+                            <div>
+                                <HoverButton
+                                    href="/Sakhawat_Hossain_CV_(5.0).pdf"
+                                    variant="outline"
+                                    download="Sakhawat_Hossain_CV.pdf"
+                                    className="menu-cv-button"
+                                    style={{ height: '50px', padding: '0 30px', borderColor: 'var(--border-color)', width: 'fit-content' }}
+                                >
+                                    <span style={{ fontSize: '12px', letterSpacing: '0.1em', fontWeight: 600 }}>
+                                        DOWNLOAD CV
+                                    </span>
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '12px' }}>
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                </HoverButton>
                             </div>
                         </div>
                     </motion.div>

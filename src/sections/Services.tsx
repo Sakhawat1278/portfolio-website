@@ -53,7 +53,7 @@ const Services: React.FC<ServicesProps> = () => {
                         style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}
                     >
                         <div style={{ width: '28px', height: '1px', backgroundColor: 'var(--accent-color)' }} />
-                        <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.3em', opacity: 0.4, textTransform: 'uppercase' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.3em', opacity: 0.7, textTransform: 'uppercase' }}>
                             02 / CAPABILITIES
                         </span>
                     </motion.div>
@@ -64,7 +64,7 @@ const Services: React.FC<ServicesProps> = () => {
                         viewport={{ once: true }}
                         transition={{ delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
                         style={{
-                            fontSize: 'clamp(2.8rem, 6vw, 6rem)',
+                            fontSize: 'clamp(2.2rem, 6vw, 5rem)',
                             fontWeight: 800,
                             lineHeight: 0.9,
                             letterSpacing: '-0.04em',

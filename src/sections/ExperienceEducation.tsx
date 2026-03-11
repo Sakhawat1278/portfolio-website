@@ -102,7 +102,7 @@ const TimelineEntry = ({
                 style={{
                     flex: 1,
                     paddingLeft: '1rem',
-                    paddingBottom: isLast ? '0' : '2rem',
+                    paddingBottom: isLast ? '1.5rem' : '2rem',
                 }}
             >
                 {/* Period */}
@@ -129,7 +129,7 @@ const TimelineEntry = ({
                                 color: '#fff',
                                 backgroundColor: 'var(--accent-color)',
                                 padding: '2px 6px',
-                                borderRadius: '2px',
+                                borderRadius: '0',
                                 textTransform: 'uppercase',
                             }}
                         >
@@ -139,7 +139,7 @@ const TimelineEntry = ({
                 </div>
 
                 {/* Title */}
-                <h4
+                <h3
                     style={{
                         fontSize: 'clamp(0.9rem, 1.2vw, 1.05rem)',
                         fontWeight: 700,
@@ -149,7 +149,7 @@ const TimelineEntry = ({
                     }}
                 >
                     {item.title}
-                </h4>
+                </h3>
 
                 {/* Org + location */}
                 <div
@@ -190,7 +190,7 @@ const TimelineEntry = ({
                                 letterSpacing: '0.1em',
                                 padding: '3px 8px',
                                 border: '1px solid var(--border-color)',
-                                borderRadius: '3px',
+                                borderRadius: '0',
                                 opacity: 0.45,
                                 textTransform: 'uppercase',
                             }}
@@ -236,7 +236,7 @@ const ExperienceEducation: React.FC = () => {
                             style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem' }}
                         >
                             <div style={{ width: '28px', height: '1px', backgroundColor: 'var(--accent-color)' }} />
-                            <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.3em', opacity: 0.4, textTransform: 'uppercase' }}>
+                            <span style={{ fontSize: '10px', fontWeight: 800, letterSpacing: '0.3em', opacity: 0.7, textTransform: 'uppercase' }}>
                                 06 / CHRONICLES
                             </span>
                         </motion.div>
@@ -247,7 +247,7 @@ const ExperienceEducation: React.FC = () => {
                             viewport={{ once: true }}
                             transition={{ delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
                             style={{
-                                fontSize: 'clamp(2.8rem, 6vw, 6rem)',
+                                fontSize: 'clamp(2.2rem, 6vw, 5rem)',
                                 fontWeight: 800,
                                 lineHeight: 0.9,
                                 letterSpacing: '-0.04em',
