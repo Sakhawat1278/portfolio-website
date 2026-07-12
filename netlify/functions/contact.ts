@@ -37,6 +37,7 @@ export default async (req: Request, context: Context) => {
     const SMTP_PASS = process.env.SMTP_PASSWORD;
     const SMTP_HOST = 'smtp.hostinger.com';
     const SMTP_PORT = 465;
+    const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'hshohan1278@gmail.com';
 
     if (!SMTP_PASS) {
         console.error('SMTP_PASSWORD is not set in environment variables');
@@ -155,7 +156,7 @@ export default async (req: Request, context: Context) => {
         await Promise.all([
             transporter.sendMail({
                 from: `"SOHAN UX" <${SMTP_USER}>`,
-                to: SMTP_USER,
+                to: `${SMTP_USER}, ${NOTIFICATION_EMAIL}`,
                 subject: `⚡ New Transmission from ${name}`,
                 html: adminHtml,
             }),

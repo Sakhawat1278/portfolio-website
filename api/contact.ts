@@ -28,6 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const SMTP_PASS = process.env.SMTP_PASSWORD; // CRITICAL: Need this to work
     const SMTP_HOST = 'smtp.hostinger.com';
     const SMTP_PORT = 465;
+    const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL || 'hshohan1278@gmail.com';
 
     if (!SMTP_PASS) {
         console.error('SMTP_PASSWORD is not set in environment variables');
@@ -150,7 +151,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             // Send to Admin
             transporter.sendMail({
                 from: `"SOHAN UX" <${SMTP_USER}>`,
-                to: SMTP_USER,
+                to: `${SMTP_USER}, ${NOTIFICATION_EMAIL}`,
                 subject: `⚡ New Transmission from ${name}`,
                 html: adminHtml,
             }),
