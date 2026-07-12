@@ -1,38 +1,35 @@
-import { Config, Context } from "@netlify/functions";
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
+import cors from 'cors';
+import dotenv from 'dotenv';
 
-export default async (req: Request, context: Context) => {
-    // ─── CORS HANDLING ───────────────────────────────────────────────────────
-    // Netlify Functions handle OPTIONS and CORS slightly differently if using redirects,
-    // but we'll include headers for direct calls.
-    const headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    };
+// Load environment variables
+dotenv.config();
 
-    if (req.method === 'OPTIONS') {
-        return new Response(null, { status: 200, headers });
-    }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-    if (req.method !== 'POST') {
-        return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { ...headers, 'Content-Type': 'application/json' } });
-    }
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-    let body;
-    try {
-        body = await req.json();
-    } catch (e) {
-        return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } });
-    }
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-    const { name, email, message, sent_time } = body;
+// Serve static files from the Vite build directory
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// API Routes
+app.post('/api/contact', async (req, res) => {
+    const { name, email, message, sent_time } = req.body;
 
     if (!name || !email || !message) {
-        return new Response(JSON.stringify({ error: 'Missing required fields' }), { status: 400, headers: { ...headers, 'Content-Type': 'application/json' } });
+        return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // ─── SMTP CONFIG ──────────────────────────────────────────────────────────
+    // SMTP CONFIG
     const SMTP_USER = process.env.SMTP_USER || 'contact@sohanux.com';
     const SMTP_PASS = process.env.SMTP_PASSWORD;
     const SMTP_HOST = 'smtp.hostinger.com';
@@ -40,7 +37,7 @@ export default async (req: Request, context: Context) => {
 
     if (!SMTP_PASS) {
         console.error('SMTP_PASSWORD is not set in environment variables');
-        return new Response(JSON.stringify({ error: 'Server configuration error' }), { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } });
+        return res.status(500).json({ error: 'Server configuration error' });
     }
 
     const transporter = nodemailer.createTransport({
@@ -51,12 +48,13 @@ export default async (req: Request, context: Context) => {
             user: SMTP_USER,
             pass: SMTP_PASS,
         },
-        connectionTimeout: 10000, // 10s connection timeout for serverless
+        connectionTimeout: 10000, // 10s connection timeout
         greetingTimeout: 10000,   // 10s greeting timeout
         socketTimeout: 10000,     // 10s socket inactivity timeout
     });
 
     try {
+        // 1. ADMIN NOTIFICATION TEMPLATE
         const adminHtml = `
 <!DOCTYPE html>
 <html lang="en">
@@ -120,6 +118,7 @@ export default async (req: Request, context: Context) => {
 </html>
         `;
 
+        // 2. SENDER REPLY TEMPLATE
         const replyHtml = `
 <!DOCTYPE html>
 <html lang="en">
@@ -152,6 +151,7 @@ export default async (req: Request, context: Context) => {
 </html>
         `;
 
+        // 3. EXECUTE MAILING IN PARALLEL
         await Promise.all([
             transporter.sendMail({
                 from: `"SOHAN UX" <${SMTP_USER}>`,
@@ -168,13 +168,18 @@ export default async (req: Request, context: Context) => {
             })
         ]);
 
-        return new Response(JSON.stringify({ success: true }), { status: 200, headers: { ...headers, 'Content-Type': 'application/json' } });
+        res.status(200).json({ success: true });
     } catch (error: any) {
         console.error('Mail Error:', error);
-        return new Response(JSON.stringify({ error: 'Failed to send transmission', details: error?.message || error }), { status: 500, headers: { ...headers, 'Content-Type': 'application/json' } });
+        res.status(500).json({ error: 'Failed to send transmission', details: error?.message || error });
     }
-};
+});
 
-export const config: Config = {
-    path: "/api/contact"
-};
+// Fallback for SPA (React Router)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

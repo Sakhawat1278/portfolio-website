@@ -42,6 +42,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             user: SMTP_USER,
             pass: SMTP_PASS,
         },
+        connectionTimeout: 10000, // 10s connection timeout for serverless
+        greetingTimeout: 10000,   // 10s greeting timeout
+        socketTimeout: 10000,     // 10s socket inactivity timeout
     });
 
     try {
@@ -142,27 +145,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 </html>
         `;
 
-        // 3. EXECUTE MAILING
-        // Send to Admin
-        await transporter.sendMail({
-            from: `"SOHAN UX" <${SMTP_USER}>`,
-            to: SMTP_USER,
-            subject: `⚡ New Transmission from ${name}`,
-            html: adminHtml,
-        });
-
-        // Send Auto-Reply to User
-        await transporter.sendMail({
-            from: `"Sakhawat Hossain Sohan" <${SMTP_USER}>`,
-            replyTo: SMTP_USER,
-            to: email,
-            subject: `Message Received — Sakhawat Hossain Sohan`,
-            html: replyHtml,
-        });
+        // 3. EXECUTE MAILING IN PARALLEL
+        await Promise.all([
+            // Send to Admin
+            transporter.sendMail({
+                from: `"SOHAN UX" <${SMTP_USER}>`,
+                to: SMTP_USER,
+                subject: `⚡ New Transmission from ${name}`,
+                html: adminHtml,
+            }),
+            // Send Auto-Reply to User
+            transporter.sendMail({
+                from: `"Sakhawat Hossain Sohan" <${SMTP_USER}>`,
+                replyTo: SMTP_USER,
+                to: email,
+                subject: `Message Received — Sakhawat Hossain Sohan`,
+                html: replyHtml,
+            })
+        ]);
 
         return res.status(200).json({ success: true });
-    } catch (error) {
+    } catch (error: any) {
         console.error('Mail Error:', error);
-        return res.status(500).json({ error: 'Failed to send transmission' });
+        return res.status(500).json({ error: 'Failed to send transmission', details: error?.message || error });
     }
 }
