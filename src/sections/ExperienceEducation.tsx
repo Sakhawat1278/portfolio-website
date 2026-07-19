@@ -4,6 +4,16 @@ import { motion } from 'framer-motion';
 /* ─── DATA ─────────────────────────────────────────────────────────────────── */
 const experience = [
     {
+        period: '04/2026 – Present',
+        title: 'CMS Leader',
+        org: 'KODEVIO LIMITED',
+        location: 'Dhaka, Bangladesh',
+        description:
+            'Leading the CMS division, architecting high-performance enterprise systems, and managing technical engineering lifecycles for scalable web architectures.',
+        tags: ['CMS Leadership', 'WordPress Architecture', 'Team Management'],
+        current: true,
+    },
+    {
         period: '04/2024 – Present',
         title: 'Business Growth Associate',
         org: 'E-GUIDER GLOBAL',

@@ -1,73 +1,52 @@
-# React + TypeScript + Vite
+# Sakhawat Hossain Sohan | Portfolio Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A high-performance, premium portfolio built with React 19, Vite, and Framer Motion.
 
-Currently, two official plugins are available:
+## 🚀 Hostinger Deployment Guide
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+This project has been adjusted for **Hostinger Business Web Hosting** or **Cloud Hosting** using the **Node.js Web Apps** feature.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 1. Build the Project
+First, generate the production build on your local machine:
+```bash
+npm run build
 ```
+This creates a `dist` folder containing your optimized frontend.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 2. Prepare Files for Upload
+You need to upload the following files/folders to your Hostinger server (typically via File Manager or FTP):
+- `dist/` (The entire folder)
+- `server.js` (The Node.js entry point)
+- `package.json`
+- `package-lock.json`
+- `.env` (Create this on the server for your SMTP credentials)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 3. Configure Node.js on Hostinger hPanel
+1.  Go to **Websites** -> **Manage** -> **Node.js**.
+2.  Create a new **Node.js Web App**.
+3.  Set the **Entry File** to `server.js`.
+4.  Set the **App Root** to the directory where you uploaded the files.
+5.  Click **Install Dependencies** (or run `npm install` via SSH).
+6.  **Environment Variables:** Add the following in the hPanel Environment Variables section:
+    - `SMTP_PASSWORD`: Your Hostinger email password.
+    - `SMTP_USER`: `contact@sohanux.com`
+    - `PORT`: 3000 (Hostinger usually manages this, but 3000 is default).
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### 4. Start the Application
+Once dependencies are installed, click **Run** or **Start**. Your website will now serve the React frontend and handle contact form submissions via the Express server.
+
+---
+
+## 🛠 Tech Stack
+- **Frontend:** React 19, Vite, TypeScript, Framer Motion
+- **Backend:** Node.js (Express), Nodemailer
+- **Scrolling:** Lenis Smooth Scroll
+- **Icons:** Custom SVGs
+- **Theming:** Light/Dark Mode (CSS Variables)
+
+## 📁 Directory Structure
+- `src/`: React source code
+- `api/`: Vercel/Netlify serverless functions (legacy/backup)
+- `server.js`: Main server for Hostinger/VPS deployment
+- `public/`: Static assets (images, videos, PDF)
+- `dist/`: Compiled production build
